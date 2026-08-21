@@ -355,3 +355,59 @@ Priority 1, but not yet verified against the real thing).
   blank slide, add a stock-comparison-table beat, add a Bazaar Mesh beat, and
   close on the verbatim required line instead of a paraphrased one. Kept
   within the 6–8 minute target (~7:15).
+
+## 2026-08-22 (later same day) — Deployment resumed: user pushed to GitHub, Vercel multi-service discovered
+
+The user pushed the repo to GitHub themselves
+(`github.com/akshitsharma24-ux/BazzarSathi`, confirmed via the GitHub API:
+non-empty, `main` branch, pushed 2026-08-21T20:58:39Z) and started the Vercel
+import flow, which surfaced something not accounted for in the original
+Priority 1 plan: Vercel's newer **"Services"** project type, which auto-detects
+multiple deployable directories in one repo (here: `frontend/` as a Vite Web
+Service, `backend/` as a FastAPI Web Service) and can host both under a single
+Vercel project with path-based routing between them — no separate Render
+deployment needed at all. Vercel blocked the import with "vercel.json required
+to deploy projects with multiple services" and offered to auto-generate one;
+the user copied that generated config and pasted it in.
+
+**Decision:** adopted this as the new primary deployment path (simpler — one
+platform instead of two) rather than steering back to the original Render +
+Vercel split, since the user was already mid-flow on it and it's a strictly
+better outcome if it works. Kept `render.yaml` in the repo as a documented
+fallback in case the Vercel Python service hits a dependency-size or cold-start
+limit that Render wouldn't.
+
+**What was added:**
+- Root-level `vercel.json` — the exact config Vercel generated (`services`
+  block: `frontend` at Vite, `backend` at root; `rewrites`: `/api(/.*)?` →
+  backend service, everything else → frontend service). Written verbatim
+  rather than edited, since this is a very new/unfamiliar Vercel feature and
+  guessing at "improvements" to a schema neither of us has full docs for
+  seemed like the wrong place to take risk.
+- **Genuine unknown, hedged defensively:** whether Vercel's service-rewrite
+  forwards the *full* incoming path to the backend (so `/api/dashboard`
+  arrives as `/api/dashboard`) or *strips* the matched `/api` prefix first (so
+  it arrives as `/dashboard`) isn't something that could be verified without a
+  live deploy to test against. Rather than guess and risk a broken deploy,
+  `backend/app/main.py` now registers every router twice — once at the bare
+  path (`/dashboard`, `/simulate`, etc.) and once under an `/api` prefix
+  (`/api/dashboard`, `/api/simulate`, etc.) — so it answers correctly either
+  way. Verified locally: both `/dashboard` and `/api/dashboard` (and the other
+  three endpoints) return identical, correct responses.
+- `frontend/.env.example` updated: for this unified deploy, `VITE_API_BASE`
+  must be set to `/api` (relative, same-origin) rather than an absolute
+  backend URL — otherwise the frontend would try to call `localhost` from the
+  live site. Documented both cases (unified Vercel vs. separate-backend
+  fallback).
+- Confirmed `npm run build` (the exact command Vercel will run) succeeds
+  cleanly with no changes needed.
+- Rewrote README's Deployment section: unified-Vercel path is now primary
+  with step-by-step instructions including the "verify `/api/dashboard`
+  directly once live" check; the original Render+Vercel split is kept as a
+  documented fallback. Updated the top-of-file "Live demo" status line to
+  reflect that deployment is in progress rather than not-yet-started.
+
+**Status:** deployment is actively in progress on the user's end (they're on
+the Vercel import screen). Not yet re-verified against a live URL — that
+remains the one open item from Priority 6, to be done as soon as the deploy
+completes.

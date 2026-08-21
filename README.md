@@ -2,18 +2,16 @@
 
 ## 🔗 Live demo
 
-**Status: not yet deployed.** The app is fully deployment-ready (see
-[Deployment](#deployment) below) — `render.yaml`, a `Procfile`, and
-`vercel.json` are already in place — but publishing to Render/Vercel requires
-an authenticated push to a GitHub repo and account access to those hosts,
-neither of which were available in the autonomous build environment. Once
-deployed, the live URLs will be linked here:
+**Status: deploying now.** Code is pushed to GitHub
+(`akshitsharma24-ux/BazzarSathi`) and being imported into Vercel as a single
+multi-service project (frontend + FastAPI backend together, see
+[Deployment](#deployment) below). Once live, the URL will be linked here:
 
-- **Frontend:** _pending_
-- **Backend API:** _pending_
+- **App (frontend + backend under one domain):** _pending_
 
-See [Deployment](#deployment) for the exact steps to finish this in about 10
-minutes.
+`render.yaml` remains in the repo as a fallback path (separate Render backend
++ Vercel frontend) in case the single-project Vercel deploy hits a limit —
+see [Deployment](#deployment).
 
 An AI decision-support tool for street food vendors: forecast tomorrow's
 demand, simulate hundreds of possible outcomes, and get a stock recommendation
@@ -175,20 +173,58 @@ Open `http://localhost:5173`. The frontend expects the backend at
 
 ## Deployment
 
-Everything needed to deploy is already in the repo — this is a ~10 minute,
-mostly-clicking task. The autonomous build environment had no GitHub push
-credentials and no Render/Vercel account access (both require an interactive
-browser login), so this last mile needs a human.
+### Primary path: one Vercel project, both services (recommended)
 
-**1. Push to GitHub** (repo already exists, empty, at
-`github.com/akshitsharma24-ux/BazzarSathi`):
-```bash
-git remote add origin https://github.com/akshitsharma24-ux/BazzarSathi.git
-git branch -M main
-git push -u origin main
+Vercel's multi-service ("Services") project type can host the frontend and
+the FastAPI backend together under one domain, with `/api/*` routed to the
+backend and everything else to the frontend — no separate backend host
+needed. The root-level [`vercel.json`](vercel.json) already declares this:
+
+```json
+{
+  "services": {
+    "frontend": { "root": "frontend", "framework": "vite" },
+    "backend": { "root": "backend" }
+  },
+  "rewrites": [
+    { "source": "/api(/.*)?", "destination": { "type": "service", "service": "backend" } },
+    { "source": "/(.*)", "destination": { "type": "service", "service": "frontend" } }
+  ]
+}
 ```
 
-**2. Backend on Render** (free tier):
+To deploy:
+1. Push this repo to GitHub (already done for this project —
+   `github.com/akshitsharma24-ux/BazzarSathi`).
+2. In Vercel, **New Project → Import** the repo. It should auto-detect both
+   services (frontend as Vite, backend as FastAPI) from `vercel.json` and the
+   directory contents.
+3. **Before deploying**, add an environment variable:
+   `VITE_API_BASE` = `/api` — this makes the frontend call same-origin
+   `/api/...` paths instead of `localhost`, which is required for the
+   rewrite rule above to route requests to the backend. (See
+   `frontend/.env.example`.)
+4. Deploy. Note the resulting single URL (e.g. `https://bazzar-sathi.vercel.app`).
+5. **Verify the backend actually answers under `/api`** — hit
+   `https://<your-url>/api/dashboard` directly. The backend
+   (`backend/app/main.py`) registers every route at both the bare path
+   (`/dashboard`) and under an `/api` prefix (`/api/dashboard`) specifically
+   because it wasn't possible to confirm ahead of time whether Vercel's
+   service-rewrite forwards the full incoming path or strips the matched
+   prefix before proxying — this dual registration means it works either way,
+   but it's still worth a direct check once live.
+6. Update this README's "Live demo" link at the top with the real URL.
+
+CORS is a non-issue here since frontend and backend are served from the same
+origin — the `ALLOWED_ORIGINS` env var only matters for the fallback path
+below.
+
+### Fallback path: separate Render backend + Vercel frontend
+
+If the single-project Vercel deploy runs into a limit (e.g. the Python
+service's dependency size), fall back to two separate deployments:
+
+**1. Backend on Render** (free tier):
 - New → Blueprint → connect the repo. Render will detect `render.yaml` at
   the repo root and configure everything (root dir `backend`, build/start
   commands, Python 3.12.7) automatically.
@@ -197,20 +233,17 @@ git push -u origin main
   `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
 - Once live, note the URL (e.g. `https://bazaarsaathi-api.onrender.com`).
 
-**3. Frontend on Vercel** (free tier):
-- Import the same GitHub repo, set **root directory to `frontend`** (Vercel
-  auto-detects the Vite framework preset via `vercel.json`).
-- Add an environment variable `VITE_API_BASE` = the Render URL from step 2
-  (no trailing slash).
+**2. Frontend on Vercel** (as its own single-service project this time):
+- Import the repo, set **root directory to `frontend`** (Vercel auto-detects
+  the Vite framework preset via `frontend/vercel.json`).
+- Add an environment variable `VITE_API_BASE` = the Render URL from step 1
+  (no trailing slash) instead of `/api`.
 - Deploy. Note the resulting URL (e.g. `https://bazaarsaathi.vercel.app`).
 
-**4. Lock down CORS** (optional but recommended): back in Render, set the
-backend's `ALLOWED_ORIGINS` env var to the exact Vercel URL from step 3
+**3. Lock down CORS** (optional but recommended): back in Render, set the
+backend's `ALLOWED_ORIGINS` env var to the exact Vercel URL from step 2
 (comma-separate if there's more than one, e.g. a preview + prod URL) instead
 of the default `*`, then redeploy.
-
-**5. Update this README** — replace the "pending" live demo links at the top
-with the real URLs.
 
 **Railway / Netlify alternative:** `backend/Procfile` + `backend/runtime.txt`
 work for Railway's Python buildpack the same way; Netlify auto-detects the

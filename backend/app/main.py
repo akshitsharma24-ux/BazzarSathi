@@ -38,12 +38,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(dashboard.router, tags=["dashboard"])
-app.include_router(forecast.router, tags=["forecast"])
-app.include_router(simulate.router, tags=["simulate"])
-app.include_router(mesh.router, tags=["mesh"])
+# Registered at both the bare paths (local dev, direct backend access) and
+# under an /api prefix (Vercel's multi-service deploy routes "/api/*" to this
+# service -- whether that rewrite forwards the full path or strips the
+# matched prefix before proxying isn't something we could verify without a
+# live deploy, so both are wired up rather than gambling on one behavior).
+for prefix in ("", "/api"):
+    app.include_router(dashboard.router, prefix=prefix, tags=["dashboard"])
+    app.include_router(forecast.router, prefix=prefix, tags=["forecast"])
+    app.include_router(simulate.router, prefix=prefix, tags=["simulate"])
+    app.include_router(mesh.router, prefix=prefix, tags=["mesh"])
 
 
 @app.get("/")
+@app.get("/api")
 def root():
     return {"status": "ok", "service": "BazaarSaathi API"}
