@@ -3,6 +3,12 @@
 **Target length: 6-8 minutes.** Keep energy up, keep the screen moving —
 narrate over the live app, don't just read slides.
 
+**Not yet recorded.** This script is current against the live app
+(https://bazzar-sathi.vercel.app) as of the 2026-08-22 redesign pass, but no
+actual video file exists yet — recording needs a human voice and screen
+capture, neither of which this session had tooling for. Record against the
+live URL, not localhost, so what judges see matches what's on screen here.
+
 ---
 
 ## 1. Landing page — the vendor's problem (0:00 – 0:45)
@@ -20,7 +26,7 @@ narrate over the live app, don't just read slides.
 
 *(Read the "Meet Ramesh" card on screen, then click "See how it works →".)*
 
-## 2. Dashboard (0:45 – 1:30)
+## 2. Dashboard (0:45 – 1:45)
 
 > "This is BazaarSaathi — the intelligence a formal retailer's supply chain
 > team has, built for a street vendor."
@@ -28,8 +34,19 @@ narrate over the live app, don't just read slides.
 *(On the Dashboard page.)*
 
 > "Here's today's snapshot: what he prepared, what actually sold, what went
-> to waste, and today's profit. This is the starting point — now let's plan
-> for tomorrow."
+> to waste, and today's profit."
+
+*(Point at the Tomorrow's ML Forecast card.)*
+
+> "Before we even simulate anything, the trained model gives its single best
+> guess for tomorrow — here, 99 units — along with its own track record:
+> mean error, RMSE, R-squared. No black box; the model tells you how much to
+> trust it."
+
+*(Optional, if time allows: point at the "Log today's sales" voice card.)*
+
+> "And because not every vendor is comfortable typing on a phone, he can log
+> today's numbers by just speaking them — in English or Hindi."
 
 *(Click "Simulate Tomorrow →".)*
 
@@ -49,14 +66,16 @@ local-event switch.)*
 
 ## 4. The distribution (2:15 – 3:00)
 
-*(Point at the demand distribution chart.)*
+*(Point at the dark "500 FUTURES SIMULATED" card, then the demand
+distribution chart below it.)*
 
 > "It doesn't just predict *one* tomorrow. It simulates **500 possible
 > versions** of tomorrow — slightly different weather, slightly different
 > turnout, the natural noise in any forecast — and looks at how demand plays
-> out across all of them. This histogram is that spread. Most forecasting
-> tools give you a single number and hope for the best. We show the vendor
-> the full range of what could happen."
+> out across all of them. Here's the range: anywhere from 97 to 149 units,
+> most likely around 124. This histogram is that same spread in detail. Most
+> forecasting tools give you a single number and hope for the best. We show
+> the vendor the full range of what could happen."
 
 ## 5. Survival Stock reveal + stock comparison (3:00 – 4:00)
 
@@ -110,7 +129,17 @@ local-event switch.)*
 > vendor who actually needs it, just a few hundred metres away. That's real
 > rupees recovered that would otherwise just be thrown out."
 
-## 10. Closing line (6:45 – 7:15)
+## 9b. Language toggle (6:45 – 7:00, optional if time is tight)
+
+*(Click "हिं" in the header.)*
+
+> "And this whole experience works in Hindi too — not just this screen, the
+> full flow. For a lot of vendors, that's the difference between a tool they
+> can actually use and one they can't."
+
+*(Click back to "EN".)*
+
+## 10. Closing line (7:00 – 7:30)
 
 *(Let the closing line on screen speak for itself, then say it aloud.)*
 
