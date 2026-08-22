@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getDashboard } from "../api/client.js";
 import VendorCard from "../components/VendorCard.jsx";
+import SalesTrendChart from "../components/SalesTrendChart.jsx";
 import ForecastCard from "../components/ForecastCard.jsx";
 import BazaarIntelligenceCard from "../components/BazaarIntelligenceCard.jsx";
 import VoiceLogger from "../components/VoiceLogger.jsx";
@@ -39,6 +40,7 @@ export default function Dashboard({ onGoToSimulate }) {
       {!loading && data && (
         <>
           <VendorCard data={data} />
+          <SalesTrendChart />
           <ForecastCard />
           <BazaarIntelligenceCard />
           <VoiceLogger />

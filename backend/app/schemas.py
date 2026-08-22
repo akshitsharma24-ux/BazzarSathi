@@ -52,6 +52,18 @@ class SimulateResponse(BaseModel):
     risk_mode: str
 
 
+class SalesHistoryPoint(BaseModel):
+    date: str
+    units_sold: int
+    units_prepared: int
+    profit: float
+
+
+class SalesHistoryResponse(BaseModel):
+    days: int
+    points: list[SalesHistoryPoint]
+
+
 class FeatureImportance(BaseModel):
     feature: str
     importance: float

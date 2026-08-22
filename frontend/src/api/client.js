@@ -30,6 +30,11 @@ export async function getModelInfo() {
   return handle(res);
 }
 
+export async function getSalesHistory(days = 14) {
+  const res = await fetch(`${API_BASE}/sales-history?days=${days}`);
+  return handle(res);
+}
+
 export async function getNeighborhoodInsights() {
   const res = await fetch(`${API_BASE}/neighborhood-insights`);
   return handle(res);
