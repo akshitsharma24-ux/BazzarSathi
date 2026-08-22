@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
+const isLocalHost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+const API_BASE =
+  import.meta.env.VITE_API_BASE || (isLocalHost ? "http://127.0.0.1:8000" : "/api");
 
 async function handle(res) {
   if (!res.ok) {
