@@ -142,6 +142,7 @@ Open `http://localhost:5173`. The frontend expects the backend at
 | GET    | `/forecast`  | Raw ML demand prediction for tomorrow given weather/event params     |
 | POST   | `/simulate`  | Full BazaarTwin engine: Survival Stock + distribution + why + savings |
 | POST   | `/mesh/match` | Bazaar Mesh: matches today's surplus/shortage against hardcoded nearby vendors |
+| GET    | `/model-info` | Forecaster quality metrics (MAE/RMSE/R2, top feature importances), from training-time `metrics.json` |
 
 ## What's implemented vs. future scope
 
@@ -157,6 +158,17 @@ Open `http://localhost:5173`. The frontend expects the backend at
   messaging, or map).
 - A landing page framing the problem in human terms, and a full
   Dashboard + Simulate flow.
+- English/Hindi language toggle covering all UI copy (`frontend/src/i18n.jsx`),
+  persisted per-browser and synced to `<html lang>` for screen readers.
+- A voice-input prototype ("Log today's sales") on the Dashboard using the
+  Web Speech API, with a typed-text fallback when unsupported — demonstrates
+  the accessibility idea without pretending to persist data (there's no
+  manual sales-entry endpoint; the dashboard reads the synthetic CSV only).
+- Tomorrow's raw ML forecast and model accuracy (MAE/RMSE/R²) now surface on
+  the Dashboard before a vendor ever opens Simulate, and a "500 futures
+  simulated" summary (range + most likely value) appears immediately after
+  running BazaarTwin — both were built on the backend from the start but
+  never wired into the UI until this pass.
 
 **Explicitly future scope (not built now — out of scope for this hackathon submission):**
 - Voice input / speech-to-text for vendors who prefer talking over typing.

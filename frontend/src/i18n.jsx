@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const STRINGS = {
   en: {
@@ -306,6 +306,10 @@ export function LanguageProvider({ children }) {
       // ignore -- storage may be unavailable (private browsing etc.)
     }
   }
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const t = useMemo(() => {
     const dict = STRINGS[lang] || STRINGS.en;

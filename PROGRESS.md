@@ -459,3 +459,107 @@ the localhost fallback, with `/api/dashboard` still returning correct data.
 live, correct, and re-verified end-to-end against the real deployed URL —
 not just local dev servers. README's "Live demo" section and Deployment
 walkthrough updated with the real URL and this finding.
+
+## 2026-08-22 (continued) — Frontend redesign, model metrics, i18n, voice prototype
+
+User feedback: the frontend "looked bad" (an unstyled default-Tailwind
+read: `gray-50`/`gray-200`/`shadow-sm` everywhere, no real type system) and
+asked for a full pass on visual polish plus anything still missing against
+the original PS5 spec, with an open-ended time budget.
+
+**Audited the spec against the actual shipped product first** rather than
+assuming everything was covered, and found two real, backend-complete but
+UI-invisible gaps:
+- `GET /forecast` existed and was even implemented client-side
+  (`api/client.js:getForecast`) but no page ever called it — the spec's
+  demo flow explicitly wants "tomorrow's base ML forecast" shown before a
+  vendor clicks "Simulate," and that step didn't exist anywhere in the UI.
+- Model quality metrics (MAE/RMSE/R²) were computed and printed at training
+  time but never exposed anywhere past the console — the spec's ML section
+  explicitly calls for showing these.
+
+**Fixes, in order:**
+
+1. **`/model-info` endpoint** (`backend/app/routers/model_info.py`):
+   `forecast_model.py` now writes `metrics.json` next to `model.pkl` at
+   training time (mae/rmse/r2/trained_rows/top_features); the new endpoint
+   reads it, with a hardcoded fallback so it never 500s if metrics.json is
+   missing. Retrained to regenerate it — R² 0.81, consistent with the
+   post-review-fixes number above (model.pkl came out byte-identical to the
+   committed one, confirming the fixed `random_state=42` + pinned dep
+   versions reproduce deterministically on this machine).
+
+2. **Full visual redesign.** New design system rather than incremental
+   tweaks: warm terracotta (`saathi`) + teal (`mesh`) palette replacing
+   default Tailwind gray/orange, `ink` neutral scale instead of stock gray,
+   Sora (display) + Inter (body) via Google Fonts, custom shadows/radii, a
+   hand-styled range slider (`index.css`), and consistent entrance motion
+   (`fade-up`/`pop`/`grow-bar` keyframes in `tailwind.config.js`) instead of
+   static cards. Every component rebuilt on it: `Landing` (real hero +
+   step cards instead of one centered card), `VendorCard`,
+   `SurvivalStockCard`, `DemandChart` (gradient bars, per-bar grow-in
+   animation, dark pill marker), `WhyExplainer`, `SavingsCalculator`,
+   `StockComparisonTable`, `BazaarMeshCard`, `RiskPersonalityToggle` (now
+   with the 🛡/⚖/🚀 icons the spec's mockup shows). New `ForecastCard`
+   (closes gap #1 above, also displays the new model-info metrics) and new
+   `SimulationSummary` — a dark hero card showing "{n} FUTURES SIMULATED"
+   with the demand range and most-likely value, matching the spec's
+   BazaarTwin mockup almost verbatim; this didn't exist as a distinct UI
+   moment before (the range/most-likely numbers were only implicitly
+   visible inside the histogram axis labels).
+
+3. **English/Hindi toggle** (`frontend/src/i18n.jsx`) — a from-scratch
+   context provider, not a library (kept the dependency list minimal, same
+   reasoning as the original "no charting library" decision). Covers all
+   page copy and component labels, persists to `localStorage`, and syncs
+   `document.documentElement.lang` so screen readers/browser-translate pick
+   up the active language. Directly answers the PS5 brief's "local
+   language / digital literacy" accessibility ask, which nothing in the
+   product addressed before this.
+
+4. **Voice-input prototype** (`VoiceLogger.jsx`, spec section 12, P1 /
+   optional) — Web Speech API, parses a spoken sentence like "Sold 91, 9
+   left" into structured `{sold, unsold}` numbers, recognition language
+   follows the active UI language (en-IN/hi-IN). Falls back to a manual
+   text input when `SpeechRecognition` isn't available. **Deliberately not
+   wired to persist anything** — there's no manual-sales-entry write
+   endpoint on the backend (the dashboard is read-only, driven by the
+   synthetic CSV), so pretending this saves data would be misleading; the
+   UI says so explicitly. **Bug found during Playwright verification:** in
+   a headless-Chromium session with no microphone, Chrome's
+   `SpeechRecognition` exposed the API but never fired `onerror` or `onend`
+   — the button stuck on "Listening..." forever, which would be a visible,
+   confusing failure in front of judges if it happened on stage. Fixed with
+   an 8-second client-side safety timeout that force-stops and shows a
+   friendly retry message if neither a result nor a native error arrives in
+   time; verified the recovery path fires within the timeout window and the
+   button re-arms correctly afterward.
+
+**Verification.** Used a hand-rolled Playwright driver (`chromium-cli`
+wasn't available in this environment; installed `playwright` into the
+session scratchpad rather than the project — kept it out of
+`package.json` since the cached Chromium binary was already present and
+this was a one-off verification harness, not a project dependency) against
+the real local backend (retrained model, live `/model-info`) at both
+1280×900 and 375×812 viewports: landing → dashboard (incl. new forecast
+card, model metrics, voice logger) → language toggle → simulate → all three
+risk modes → Bazaar Mesh → mobile pass. Zero console/page errors throughout.
+
+**Regression caught and fixed:** `StockComparisonTable` had reverted to a
+horizontally-scrolling table during the rewrite, which reintroduced the
+exact mobile bug a prior session had already fixed (documented above under
+Priority 5) — the "Stockout" column clipped off-screen on a 375px viewport
+with no visible scroll affordance. Caught by the same kind of real-viewport
+Playwright check that found it the first time, not by memory of the old
+fix. Restored the `table-fixed` layout; re-verified all four columns stay
+visible on mobile.
+
+**Deployed and re-verified live**, not just locally: pushed all three
+commits, polled the GitHub deployments API until Vercel reported the new
+build as `success`, then re-checked the live site.
+
+Kept scope disciplined against the pasted spec's explicit "don't build"
+list — no OCR, no Bazaar Intelligence/collective learning, no PM SVANidhi
+assistant, no real marketplace/auth/payments, no deep learning. The two
+features added (voice, language toggle) are both explicitly P1 items in the
+spec's own hierarchy, not scope creep.
