@@ -143,6 +143,7 @@ Open `http://localhost:5173`. The frontend expects the backend at
 | POST   | `/simulate`  | Full BazaarTwin engine: Survival Stock + distribution + why + savings |
 | POST   | `/mesh/match` | Bazaar Mesh: matches today's surplus/shortage against hardcoded nearby vendors |
 | GET    | `/model-info` | Forecaster quality metrics (MAE/RMSE/R2, top feature importances), from training-time `metrics.json` |
+| GET    | `/neighborhood-insights` | Bazaar Intelligence: pooled rain/weekend/event demand impact % across 5 nearby synthetic vendors |
 
 ## What's implemented vs. future scope
 
@@ -158,28 +159,46 @@ Open `http://localhost:5173`. The frontend expects the backend at
   messaging, or map).
 - A landing page framing the problem in human terms, and a full
   Dashboard + Simulate flow.
-- English/Hindi language toggle covering all UI copy (`frontend/src/i18n.jsx`),
-  persisted per-browser and synced to `<html lang>` for screen readers.
+- English/Hindi/Marathi language toggle covering all UI copy
+  (`frontend/src/i18n.jsx`), persisted per-browser and synced to
+  `<html lang>` for screen readers.
 - A voice-input prototype ("Log today's sales") on the Dashboard using the
-  Web Speech API, with a typed-text fallback when unsupported — demonstrates
-  the accessibility idea without pretending to persist data (there's no
-  manual sales-entry endpoint; the dashboard reads the synthetic CSV only).
+  Web Speech API (recognition language follows the active UI language), with
+  a typed-text fallback when unsupported — demonstrates the accessibility
+  idea without pretending to persist data (there's no manual sales-entry
+  endpoint; the dashboard reads the synthetic CSV only).
 - Tomorrow's raw ML forecast and model accuracy (MAE/RMSE/R²) now surface on
   the Dashboard before a vendor ever opens Simulate, and a "500 futures
   simulated" summary (range + most likely value) appears immediately after
   running BazaarTwin — both were built on the backend from the start but
   never wired into the UI until this pass.
+- **Bazaar Intelligence** — pooled, anonymized rain/weekend/event demand
+  patterns aggregated across 5 nearby synthetic vendors
+  (`backend/app/data/generate_neighborhood_data.py`), for a vendor who
+  doesn't yet have enough sales history of their own. Pulled forward from
+  future scope at the user's request; kept fully synthetic like the rest of
+  the prototype.
+- **OCR wholesale-bill scanner** (`BillScannerCard.jsx`) — client-side OCR
+  (tesseract.js, lazy-loaded) that photographs/uploads a supplier invoice
+  and extracts quantity/price line items. Also pulled forward from future
+  scope; deliberately not wired to update any real inventory data, same
+  reasoning as the voice logger.
+- **Live weather pre-fill** on the Simulate page — a button fetches
+  tomorrow's real Mumbai forecast from Open-Meteo (free, no API key) and
+  pre-fills the rain/temperature sliders, on top of manual adjustment. The
+  simulation itself still runs on the synthetic-trained model.
 
 **Explicitly future scope (not built now — out of scope for this hackathon submission):**
-- Voice input / speech-to-text for vendors who prefer talking over typing.
-- OCR / bill scanning to auto-log daily sales instead of manual entry.
-- **Bazaar Intelligence / collective learning** — Bazaar Mesh here is
-  intentionally a single hardcoded match against 5 fixed vendors. A real
-  version — pooling live, anonymized patterns across many vendors to improve
-  forecasts and matching faster than any single vendor's own history could —
-  remains future scope.
+- A production version of Bazaar Intelligence pooling *live* (not synthetic)
+  anonymized patterns across many real vendors, continuously updated —
+  what's implemented now is a synthetic-data proof of the concept.
+- A production version of the OCR bill scanner that actually updates
+  inventory/cost data — what's implemented now is a client-side
+  extraction demo with no backend write path.
 - Government scheme integration (e.g. PM SVANidhi eligibility/credit access).
 - User authentication, payments, or persistent multi-vendor accounts.
+- Live hyperlocal event data (ticketing APIs, local council calendars) —
+  the "local event" signal is still a manual toggle / synthetic flag.
 
 ## Deployment
 

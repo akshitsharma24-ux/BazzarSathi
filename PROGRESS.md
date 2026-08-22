@@ -563,3 +563,71 @@ list — no OCR, no Bazaar Intelligence/collective learning, no PM SVANidhi
 assistant, no real marketplace/auth/payments, no deep learning. The two
 features added (voice, language toggle) are both explicitly P1 items in the
 spec's own hierarchy, not scope creep.
+
+## 2026-08-22 (continued) — Pulled two future-scope items forward, plus live weather + Marathi
+
+User explicitly asked to proceed past P0/P1 into the spec's "future scope"
+list (which the spec itself had marked "don't build before submission").
+Asked which items specifically, rather than guessing across a list with
+wildly different feasibility (a synthetic neighborhood-insights panel vs.
+actually wiring up UPI/POS, which isn't realistically buildable in a
+prototype). User picked **Bazaar Intelligence** and **OCR bill scanning**.
+
+**Bazaar Intelligence:** `backend/app/data/generate_neighborhood_data.py`
+generates 5 other synthetic nearby vendors by reusing `generate_data.py`'s
+generative process through new optional parameters (base demand, rain/
+weekend/event sensitivity, seed) rather than duplicating the demand model.
+**Verified the refactor first** — regenerated `vendor_sales.csv` with the
+new default-arg signature and diffed it byte-for-byte against the committed
+file before building anything on top of it, since this touches the exact
+function the whole forecasting pipeline depends on. Pools each neighbor's
+own rain/weekend/event impact (as a % of that vendor's own mean demand, so
+vendors with different baselines are comparable before averaging) into
+`neighborhood_insights.json`: -15.6% rain, +22.9% weekend, +37.5% event —
+close to the spec's own worked example. New `GET /neighborhood-insights`
+endpoint + `BazaarIntelligenceCard.jsx` on the Dashboard. **Reused the exact
+same 5 vendor names already hardcoded in Bazaar Mesh** (Iqbal's Vada Pav
+Cart, Sunita's Chaat Stall, etc.) so both features draw from one consistent
+fictional neighborhood.
+
+**OCR bill scanner:** `BillScannerCard.jsx`, client-side OCR via
+`tesseract.js`, dynamically imported so the ~7KB gzip chunk only loads for
+someone who actually opens this card (verified: main bundle only grew ~1KB
+gzip). **Tested against a real image, not just wired up and assumed
+working** — generated a synthetic invoice image via canvas ("Potato 50 kg
+20", "Onion 30 kg 18", "Oil 10 ltr 110") and ran it through the actual OCR
+pipeline: correctly extracted "Potato 50kg 20" -> 50 x Rs20 and "Onion
+30kg 18" -> 30 x Rs18; misread "10 ltr" as "101tr" on the third line, which
+still parsed to a plausible (if wrong) line item — exactly the accuracy
+variance the UI discloses rather than hides. No backend write path, same
+reasoning as VoiceLogger: pretending this updates inventory would be
+misleading.
+
+**Two more additions beyond what was asked**, judged as safe, well-scoped,
+and clearly beneficial rather than scope creep:
+
+- **Live weather pre-fill** (`frontend/src/utils/weather.js`) — a button on
+  Simulate fetches tomorrow's real Mumbai forecast from Open-Meteo (free, no
+  API key or signup, confirmed CORS-open for direct browser calls) and
+  pre-fills the rain/temperature sliders. This isn't future-scope content;
+  it's a real-data enhancement of the already-built P0 "weather inputs"
+  feature, so it didn't need to go through the same "which future item"
+  question. The simulation itself still runs on the synthetic-trained model.
+- **Marathi as a third language** — cheap to add now that the i18n system
+  exists from the Hindi pass; matches the spec's own Phase 2 roadmap
+  verbatim ("Hindi + Marathi"). Extended the toggle to a three-way EN/HI/MR
+  switch, translated every string, and fixed `VoiceLogger`'s
+  `SpeechRecognition` language mapping to include `mr-IN`.
+
+**Verification:** killed and restarted dev servers cleanly partway through
+this pass after noticing duplicate stale `uvicorn`/`vite` processes left
+running across earlier tool calls in the session were silently failing to
+bind and serving stale code — caught via `Get-CimInstance Win32_Process`,
+not assumed. Full Playwright pass afterward: Bazaar Intelligence + OCR
+cards on desktop and mobile in English and Hindi; live weather fetch
+end-to-end; full Marathi run of the Simulate flow (weather -> 500 futures
+-> risk modes -> why-breakdown -> savings -> mesh) confirming `<html lang>`
+syncs to "mr" and every string is translated; then re-ran the existing
+English regression suite to confirm nothing broke. Zero console errors
+throughout. Pushed and re-verified against the live Vercel URL after each
+commit, per this project's established standard.
