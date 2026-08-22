@@ -43,7 +43,8 @@ export default function VoiceLogger() {
     setTranscript("");
 
     const recognition = new SpeechRecognition();
-    recognition.lang = lang === "hi" ? "hi-IN" : "en-IN";
+    const recognitionLangs = { hi: "hi-IN", mr: "mr-IN", en: "en-IN" };
+    recognition.lang = recognitionLangs[lang] || "en-IN";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { postSimulate } from "../api/client.js";
+import { fetchTomorrowWeather } from "../utils/weather.js";
 import SimulateButton from "../components/SimulateButton.jsx";
 import SimulationSummary from "../components/SimulationSummary.jsx";
 import DemandChart from "../components/DemandChart.jsx";
@@ -29,6 +30,22 @@ export default function Simulate() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hasSimulated, setHasSimulated] = useState(false);
+
+  const [weatherState, setWeatherState] = useState("idle"); // idle | loading | done | error
+  const [weatherDate, setWeatherDate] = useState(null);
+
+  async function useRealWeather() {
+    setWeatherState("loading");
+    try {
+      const weather = await fetchTomorrowWeather();
+      setRainProbability(weather.rainProbability);
+      setTemperature(weather.temperature);
+      setWeatherDate(weather.date);
+      setWeatherState("done");
+    } catch {
+      setWeatherState("error");
+    }
+  }
 
   async function runSimulation(mode = riskMode) {
     setLoading(true);
@@ -60,6 +77,27 @@ export default function Simulate() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 space-y-6 animate-fade-up">
+        <div className="flex items-center justify-between flex-wrap gap-2 -mb-2">
+          <button
+            onClick={useRealWeather}
+            disabled={weatherState === "loading"}
+            className="flex items-center gap-2 text-sm font-medium text-mesh-700 bg-mesh-50 hover:bg-mesh-100 border border-mesh-200 disabled:opacity-60 px-3.5 py-2 rounded-xl transition"
+          >
+            {weatherState === "loading" ? (
+              <span className="inline-block w-3.5 h-3.5 border-2 border-mesh-300 border-t-mesh-700 rounded-full animate-spin" />
+            ) : (
+              <span aria-hidden="true">🌦️</span>
+            )}
+            {t("sim_use_real_weather")}
+          </button>
+          {weatherState === "done" && weatherDate && (
+            <span className="text-xs text-ink-400">{t("sim_weather_source", { date: weatherDate })}</span>
+          )}
+          {weatherState === "error" && (
+            <span className="text-xs text-rose-500">{t("sim_weather_error")}</span>
+          )}
+        </div>
+
         <div>
           <div className="flex justify-between text-sm mb-2">
             <label className="font-medium text-ink-700 flex items-center gap-1.5">

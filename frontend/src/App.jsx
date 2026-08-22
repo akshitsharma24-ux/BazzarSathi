@@ -18,26 +18,27 @@ function LogoMark() {
   );
 }
 
+const LANGUAGES = [
+  { code: "en", label: "EN" },
+  { code: "hi", label: "हिं" },
+  { code: "mr", label: "मरा" },
+];
+
 function LanguageToggle() {
   const { lang, setLang } = useLanguage();
   return (
     <div className="flex items-center rounded-full bg-ink-100 p-0.5 text-xs font-semibold">
-      <button
-        onClick={() => setLang("en")}
-        className={`px-2.5 py-1 rounded-full transition ${
-          lang === "en" ? "bg-white text-ink-900 shadow-sm" : "text-ink-400 hover:text-ink-600"
-        }`}
-      >
-        EN
-      </button>
-      <button
-        onClick={() => setLang("hi")}
-        className={`px-2.5 py-1 rounded-full transition ${
-          lang === "hi" ? "bg-white text-ink-900 shadow-sm" : "text-ink-400 hover:text-ink-600"
-        }`}
-      >
-        हिं
-      </button>
+      {LANGUAGES.map(({ code, label }) => (
+        <button
+          key={code}
+          onClick={() => setLang(code)}
+          className={`px-2.5 py-1 rounded-full transition ${
+            lang === code ? "bg-white text-ink-900 shadow-sm" : "text-ink-400 hover:text-ink-600"
+          }`}
+        >
+          {label}
+        </button>
+      ))}
     </div>
   );
 }
