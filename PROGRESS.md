@@ -564,6 +564,99 @@ assistant, no real marketplace/auth/payments, no deep learning. The two
 features added (voice, language toggle) are both explicitly P1 items in the
 spec's own hierarchy, not scope creep.
 
+## 2026-08-22 (continued, third round) — Visual overhaul + one more feature
+
+User feedback after the redesign above: "frontend still looks very bad,
+add animations, smooth scrolls... why so less features, add more." Two
+separate asks — visual polish and feature count — addressed separately
+rather than assuming one fix covers both.
+
+### Visual overhaul (commit "Visual overhaul: custom icon set,
+scroll-reveal animations, count-up numbers")
+
+Diagnosed *why* it still read as unpolished rather than re-tweaking colors
+again:
+
+1. **Every emoji replaced with a custom icon set**
+   (`frontend/src/components/icons.jsx`) — 16 hand-drawn line icons
+   (24x24 viewBox, 1.75px stroke, consistent style) across every
+   component that had emoji (RiskPersonalityToggle, WhyExplainer,
+   SavingsCalculator, SurvivalStockCard, SimulateButton, BazaarMeshCard,
+   VoiceLogger, BillScannerCard, BazaarIntelligenceCard, Simulate's
+   slider labels, Landing's badge). Emoji render inconsistently across
+   platforms/fonts and read as a hackathon shortcut next to an otherwise
+   deliberate design system. **Sanity-checked the icons in an isolated
+   HTML preview before wiring them into 10 files** (screenshot review,
+   not assumed) — caught and redrew two that didn't read clearly at
+   small size: "Event" looked like a warning triangle, "Rocket" was too
+   busy to parse. Verified zero emoji remained afterward via a codepoint
+   grep across the whole `src/` tree, not just visual spot-checks.
+
+2. **Real scroll-triggered animations**
+   (`hooks/useReveal.js` + `components/Reveal.jsx`, IntersectionObserver-
+   based). This was the actual bug behind "no animation when scrolling":
+   the previous `animate-fade-up` classes only play once on mount, so for
+   any content below the fold, the animation had already finished before
+   a user ever scrolled down to see it — scrolling itself felt completely
+   static despite CSS animations existing in the code. Applied to
+   Landing's step cards and story card with staggered delays. Respects
+   `prefers-reduced-motion`.
+
+3. **Animated count-up numbers** (`hooks/useCountUp.js`,
+   requestAnimationFrame + easeOutExpo) on figures that change when you
+   interact with the app: landing page stats, Survival Stock, savings —
+   so a risk-mode switch or fresh simulation feels like something
+   happened instead of a number silently snapping to a new value.
+
+4. **Landing hero**: drifting gradient blobs (new `blob-drift-1/2`
+   keyframes), gradient-text headline, hover-lift on cards. **Bulk-added
+   `hover:shadow-card-hover` + transition to every remaining static card**
+   via a `sed` sweep across 9 files that all happened to share the exact
+   same base className string (verified the string was identical first)
+   — VendorCard, ForecastCard, WhyExplainer, SavingsCalculator,
+   BazaarMeshCard, VoiceLogger, BillScannerCard, BazaarIntelligenceCard,
+   DemandChart all now have consistent hover feedback instead of only the
+   one or two cards that had it before.
+
+### New feature: 14-day sales trend chart
+
+Backend: `GET /sales-history?days=N` (`backend/app/routers/history.py`)
+returns `units_sold`/`units_prepared`/`profit` for the last N days —
+data that was already sitting in `vendor_sales.csv` (150 days of it) but
+only ever exposed as a single "today" row via `/dashboard`. Frontend:
+`SalesTrendChart.jsx`, a smooth gradient-area line chart (teal/mesh
+accent, curved path) on the Dashboard — deliberately a different visual
+style from the orange bar histogram on Simulate, for variety. Hoverable:
+each point updates a header value/date display.
+
+**Bug found and fixed during verification:** each point's invisible hover
+hitbox was centered on the point with a fixed width, so the leftmost
+point's hitbox extended past x=0 and got silently clipped by the SVG
+viewport — hovering day 1 did nothing. Clamped hitbox x/width to the
+viewBox bounds. **Verifying this took two attempts** — the first
+Playwright check used a page-wide `svg rect` selector and got a false
+negative, because several icon components (the header logo, calendar
+icon, etc.) also render `<rect>` elements earlier in the DOM, so
+"first rect on the page" wasn't "first point in the chart." Rescoped the
+selector to the chart's own `<svg>` specifically and confirmed: hovering
+point 0 shows its real value (90), distinct from the default last-point
+display (86).
+
+### Verification
+
+Full Playwright regression (desktop 1280x900 + mobile 375x812, English +
+Hindi) after each change, zero console errors throughout. Pushed both
+commits, polled the GitHub deployments API for `state: success`, then
+re-checked the live site directly.
+
+**Status check for continuity:** as of this entry, every P0/P1 spec item
+is built and live; two future-scope items (Bazaar Intelligence, OCR) were
+pulled forward at the user's request; live weather and Marathi were added
+as low-risk extensions. The only thing not done is the actual narrated
+demo video (needs a human voice — no audio/video tooling available in this
+environment). If a future session picks this up: check `git log --oneline`
+for anything past this entry before assuming this list is still current.
+
 ## 2026-08-22 (continued) — Pulled two future-scope items forward, plus live weather + Marathi
 
 User explicitly asked to proceed past P0/P1 into the spec's "future scope"

@@ -187,6 +187,12 @@ Open `http://localhost:5173`. The frontend expects the backend at
   tomorrow's real Mumbai forecast from Open-Meteo (free, no API key) and
   pre-fills the rain/temperature sliders, on top of manual adjustment. The
   simulation itself still runs on the synthetic-trained model.
+- **14-day sales trend chart** on the Dashboard (`GET /sales-history`) —
+  a smooth gradient-area line chart of recent actual sales, hoverable per
+  day.
+- A custom hand-drawn icon set (no emoji anywhere in the UI), real
+  scroll-triggered reveal animations, and animated count-up numbers on
+  the figures that change as you interact with the app.
 
 **Explicitly future scope (not built now — out of scope for this hackathon submission):**
 - A production version of Bazaar Intelligence pooling *live* (not synthetic)
