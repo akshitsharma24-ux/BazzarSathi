@@ -65,6 +65,21 @@ class ModelInfoResponse(BaseModel):
     top_features: list[FeatureImportance]
 
 
+class NeighborhoodVendorSummary(BaseModel):
+    name: str
+    item: str
+    avg_daily_demand: float
+
+
+class NeighborhoodInsightsResponse(BaseModel):
+    vendor_count: int
+    days_per_vendor: int
+    rain_impact_pct: float
+    weekend_impact_pct: float
+    event_impact_pct: float
+    vendors: list[NeighborhoodVendorSummary]
+
+
 class MeshMatchRequest(BaseModel):
     direction: str = Field(pattern="^(surplus|shortage|balanced)$")
     quantity: int = Field(ge=0)

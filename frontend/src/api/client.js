@@ -30,6 +30,11 @@ export async function getModelInfo() {
   return handle(res);
 }
 
+export async function getNeighborhoodInsights() {
+  const res = await fetch(`${API_BASE}/neighborhood-insights`);
+  return handle(res);
+}
+
 export async function postMeshMatch({ direction, quantity }) {
   const res = await fetch(`${API_BASE}/mesh/match`, {
     method: "POST",

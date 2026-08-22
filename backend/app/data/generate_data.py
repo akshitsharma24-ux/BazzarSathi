@@ -29,7 +29,27 @@ COST_PER_UNIT = 12.0    # rupees
 BASE_DEMAND = 80.0
 
 
-def generate_dataset(num_days: int = NUM_DAYS, seed: int = RANDOM_SEED) -> pd.DataFrame:
+def generate_dataset(
+    num_days: int = NUM_DAYS,
+    seed: int = RANDOM_SEED,
+    base_demand: float = BASE_DEMAND,
+    rain_coef: float = 1.8,
+    rain_prob_coef: float = 10.0,
+    weekend_boost: float = 18.0,
+    event_boost: float = 35.0,
+    price_per_unit: float = PRICE_PER_UNIT,
+    cost_per_unit: float = COST_PER_UNIT,
+) -> pd.DataFrame:
+    """Generates one vendor's synthetic sales history.
+
+    The keyword params all default to this file's original hardcoded
+    constants/behavior (a no-arg call reproduces the committed
+    vendor_sales.csv exactly). They exist so
+    generate_neighborhood_data.py can reuse this same generative process
+    for a handful of *different* nearby vendors (Bazaar Intelligence) --
+    each with its own demand baseline and rain/weekend/event
+    sensitivity -- without duplicating the demand model.
+    """
     rng = np.random.default_rng(seed)
 
     rows = []
@@ -49,19 +69,19 @@ def generate_dataset(num_days: int = NUM_DAYS, seed: int = RANDOM_SEED) -> pd.Da
         # --- demand model (ground truth generative process) ---
         trend = 0.05 * i  # mild upward trend (growing footfall over 120 days)
 
-        demand = BASE_DEMAND + trend
+        demand = base_demand + trend
 
         # Rain suppresses demand, proportional to how heavy the rain is.
-        demand -= rainfall * 1.8
-        demand -= rain_probability * 10
+        demand -= rainfall * rain_coef
+        demand -= rain_probability * rain_prob_coef
 
         # Weekend boost.
         if is_weekend:
-            demand += 18
+            demand += weekend_boost
 
         # Local event boost (big spike - fairs, festivals, cricket matches nearby).
         if local_event:
-            demand += 35
+            demand += event_boost
 
         # Temperature: mild effect, very hot or very cool days reduce street food demand a bit.
         demand -= 0.3 * abs(temperature - 30)
@@ -74,11 +94,11 @@ def generate_dataset(num_days: int = NUM_DAYS, seed: int = RANDOM_SEED) -> pd.Da
         # Vendor's preparation decision: an imperfect human heuristic
         # (roughly yesterday's demand expectation plus a little of their own
         # noise) -- this is what creates realistic over/under-prep patterns.
-        prep_guess = BASE_DEMAND + trend
+        prep_guess = base_demand + trend
         if is_weekend:
-            prep_guess += 12
+            prep_guess += weekend_boost * (12.0 / 18.0)
         if local_event:
-            prep_guess += 10  # vendors often underestimate event impact
+            prep_guess += event_boost * (10.0 / 35.0)  # vendors often underestimate event impact
         prep_guess += rng.normal(0, 6)
         units_prepared = int(round(max(20, prep_guess)))
 
@@ -101,8 +121,8 @@ def generate_dataset(num_days: int = NUM_DAYS, seed: int = RANDOM_SEED) -> pd.Da
             # forecast_model.py, which trains on true_demand rather than
             # units_sold for exactly this reason.
             "true_demand": round(units_sold_true_demand, 1),
-            "price_per_unit": PRICE_PER_UNIT,
-            "cost_per_unit": COST_PER_UNIT,
+            "price_per_unit": price_per_unit,
+            "cost_per_unit": cost_per_unit,
         })
 
     return pd.DataFrame(rows)

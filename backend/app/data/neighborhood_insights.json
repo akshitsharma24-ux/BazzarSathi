@@ -1,0 +1,34 @@
+{
+  "vendor_count": 5,
+  "days_per_vendor": 150,
+  "rain_impact_pct": -15.6,
+  "weekend_impact_pct": 22.9,
+  "event_impact_pct": 37.5,
+  "vendors": [
+    {
+      "name": "Iqbal's Vada Pav Cart",
+      "item": "Vada Pav",
+      "avg_daily_demand": 75.2
+    },
+    {
+      "name": "Sunita's Chaat Stall",
+      "item": "Chaat",
+      "avg_daily_demand": 60.7
+    },
+    {
+      "name": "Meena's Dosa Point",
+      "item": "Dosa",
+      "avg_daily_demand": 70.5
+    },
+    {
+      "name": "Raju's Vada Pav Stand",
+      "item": "Vada Pav",
+      "avg_daily_demand": 50.9
+    },
+    {
+      "name": "Sai Snacks",
+      "item": "Bhel Puri",
+      "avg_daily_demand": 60.3
+    }
+  ]
+}

@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { getDashboard } from "../api/client.js";
 import VendorCard from "../components/VendorCard.jsx";
 import ForecastCard from "../components/ForecastCard.jsx";
+import BazaarIntelligenceCard from "../components/BazaarIntelligenceCard.jsx";
 import VoiceLogger from "../components/VoiceLogger.jsx";
+import BillScannerCard from "../components/BillScannerCard.jsx";
 import ErrorState from "../components/ErrorState.jsx";
 import { VendorCardSkeleton } from "../components/Skeleton.jsx";
 import { useLanguage } from "../i18n.jsx";
@@ -38,7 +40,9 @@ export default function Dashboard({ onGoToSimulate }) {
         <>
           <VendorCard data={data} />
           <ForecastCard />
+          <BazaarIntelligenceCard />
           <VoiceLogger />
+          <BillScannerCard />
 
           <div className="bg-gradient-to-br from-saathi-500 to-saathi-700 rounded-2xl p-6 sm:p-7 flex items-center justify-between flex-wrap gap-5 shadow-card-hover">
             <div>
