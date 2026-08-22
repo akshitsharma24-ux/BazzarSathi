@@ -2,16 +2,14 @@
 
 ## 🔗 Live demo
 
-**Status: deploying now.** Code is pushed to GitHub
-(`akshitsharma24-ux/BazzarSathi`) and being imported into Vercel as a single
-multi-service project (frontend + FastAPI backend together, see
-[Deployment](#deployment) below). Once live, the URL will be linked here:
+**Status: live.** Deployed as a single Vercel multi-service project (frontend
++ FastAPI backend under one domain, see [Deployment](#deployment) below).
 
-- **App (frontend + backend under one domain):** _pending_
+- **App:** https://bazzar-sathi.vercel.app
 
-`render.yaml` remains in the repo as a fallback path (separate Render backend
-+ Vercel frontend) in case the single-project Vercel deploy hits a limit —
-see [Deployment](#deployment).
+`render.yaml` remains in the repo as a documented fallback path (separate
+Render backend + Vercel frontend) — not currently needed, the unified Vercel
+deploy works.
 
 An AI decision-support tool for street food vendors: forecast tomorrow's
 demand, simulate hundreds of possible outcomes, and get a stock recommendation
@@ -199,11 +197,14 @@ To deploy:
 2. In Vercel, **New Project → Import** the repo. It should auto-detect both
    services (frontend as Vite, backend as FastAPI) from `vercel.json` and the
    directory contents.
-3. **Before deploying**, add an environment variable:
-   `VITE_API_BASE` = `/api` — this makes the frontend call same-origin
-   `/api/...` paths instead of `localhost`, which is required for the
-   rewrite rule above to route requests to the backend. (See
-   `frontend/.env.example`.)
+3. Optionally add an environment variable `VITE_API_BASE` = `/api` (see
+   `frontend/.env.example`). This is no longer required to make the deploy
+   work: `frontend/src/api/client.js` auto-detects whether it's running on
+   `localhost` and defaults to `/api` on any other origin, so the app works
+   correctly even if this env var is never set on Vercel (confirmed live —
+   the first deploy shipped without it set and the frontend silently called
+   `http://127.0.0.1:8000` from every visitor's browser until this was
+   fixed).
 4. Deploy. Note the resulting single URL (e.g. `https://bazzar-sathi.vercel.app`).
 5. **Verify the backend actually answers under `/api`** — hit
    `https://<your-url>/api/dashboard` directly. The backend
@@ -211,9 +212,11 @@ To deploy:
    (`/dashboard`) and under an `/api` prefix (`/api/dashboard`) specifically
    because it wasn't possible to confirm ahead of time whether Vercel's
    service-rewrite forwards the full incoming path or strips the matched
-   prefix before proxying — this dual registration means it works either way,
-   but it's still worth a direct check once live.
-6. Update this README's "Live demo" link at the top with the real URL.
+   prefix before proxying — this dual registration means it works either way.
+   Confirmed live: Vercel forwards the full path, so `/api/dashboard` on the
+   backend service is what actually gets hit.
+6. Update this README's "Live demo" link at the top with the real URL. (Done
+   — see above.)
 
 CORS is a non-issue here since frontend and backend are served from the same
 origin — the `ALLOWED_ORIGINS` env var only matters for the fallback path

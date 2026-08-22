@@ -411,3 +411,51 @@ limit that Render wouldn't.
 the Vercel import screen). Not yet re-verified against a live URL — that
 remains the one open item from Priority 6, to be done as soon as the deploy
 completes.
+
+## 2026-08-22 (continued) — Live re-verification found and fixed a real production bug
+
+Deployment had actually already succeeded by the time this session resumed
+(confirmed via `GET /repos/.../deployments` on the GitHub API — no Vercel
+credentials needed for a read-only check like this). Two stable aliases
+resolve to it: `https://bazzar-sathi.vercel.app` and
+`https://bazzar-sathi-lfrx.vercel.app` (the raw per-deployment URLs are
+gated behind Vercel SSO and 302 to a login page — expected, not a bug).
+
+Curled all four backend endpoints directly against the live `/api/*` paths
+(`/api/dashboard`, `/api/forecast`, `/api/simulate` all three risk modes,
+`/api/mesh/match`) — all returned correct data. Confirmed Vercel's
+service-rewrite forwards the **full** incoming path (`/api/dashboard`
+arrives as `/api/dashboard`, not stripped to `/dashboard`) — resolves the
+"genuine unknown" flagged in the previous entry; the dual route registration
+in `main.py` was the right defensive call, though only the `/api`-prefixed
+half turned out to be needed.
+
+**Bug found: the live frontend was completely broken.** Downloaded the
+deployed JS bundle and grepped it — it contained the literal string
+`127.0.0.1:8000`, not `/api`, meaning `VITE_API_BASE` was never actually set
+in the Vercel project (the README instructed setting it, but nothing in the
+build enforces it, and it silently wasn't done during the user's import
+flow). Every API call from every real visitor's browser was therefore going
+to `http://127.0.0.1:8000` — which doesn't exist on their machine — so the
+dashboard, simulate, and mesh pages would all have failed to load any data
+for anyone but a developer running the backend locally. This was **not**
+caught by the previous session's Playwright passes because those ran against
+local dev servers where `VITE_API_BASE` was never in play.
+
+**Fix:** `frontend/src/api/client.js` now defaults to `/api` whenever
+`window.location.hostname` isn't `localhost`/`127.0.0.1`, only falling back
+to the explicit `VITE_API_BASE` env var or the local dev URL when actually on
+localhost. This makes the app correct by default on any non-local deploy
+without depending on a Vercel dashboard setting being configured correctly —
+removes an entire class of "it works because someone remembered to set an
+env var" failure. Verified: rebuilt locally (`npm run build`), confirmed the
+new bundle contains `"/api"` as a literal; pushed the fix
+(`3a15a6d`); polled the GitHub deployments API until the new Vercel build
+reported `state: success`; re-downloaded the live bundle from
+`bazzar-sathi.vercel.app` and confirmed it now contains `"/api"` instead of
+the localhost fallback, with `/api/dashboard` still returning correct data.
+
+**Status: Priority 1 and Priority 6 are now both fully complete.** The app is
+live, correct, and re-verified end-to-end against the real deployed URL —
+not just local dev servers. README's "Live demo" section and Deployment
+walkthrough updated with the real URL and this finding.
