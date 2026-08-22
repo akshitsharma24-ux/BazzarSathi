@@ -15,7 +15,7 @@ export default function ForecastCard() {
   }, []);
 
   return (
-    <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
+    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h3 className="font-display font-semibold text-ink-900">{t("forecast_title")}</h3>

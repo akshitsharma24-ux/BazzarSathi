@@ -1,5 +1,7 @@
 import { useLanguage } from "../i18n.jsx";
 import { getDistributionStats } from "../utils/stats.js";
+import { useCountUp } from "../hooks/useCountUp.js";
+import { ShieldIcon } from "./icons.jsx";
 
 function MetricTile({ label, value, tone }) {
   const tones = {
@@ -24,6 +26,7 @@ function riskTone(prob) {
 
 export default function SurvivalStockCard({ result }) {
   const { t } = useLanguage();
+  const displayStock = useCountUp(result?.recommended_stock ?? 0, { duration: 800 });
   if (!result) return null;
 
   const rupee = (n) => `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -37,11 +40,11 @@ export default function SurvivalStockCard({ result }) {
       <div className="relative flex items-start justify-between flex-wrap gap-4">
         <div>
           <p className="text-sm font-medium text-ink-500 flex items-center gap-1.5">
-            <span aria-hidden="true">🛡</span> {t("survival_title")}
+            <ShieldIcon className="w-4 h-4 text-saathi-600" /> {t("survival_title")}
           </p>
           <div className="flex items-baseline gap-2 mt-1">
             <span className="text-5xl sm:text-6xl font-display font-extrabold text-saathi-700 tabular-nums-all">
-              {result.recommended_stock}
+              {displayStock}
             </span>
             <span className="text-ink-400 font-medium">{t("survival_units")}</span>
           </div>

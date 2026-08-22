@@ -12,6 +12,7 @@ import SavingsCalculator from "../components/SavingsCalculator.jsx";
 import BazaarMeshCard from "../components/BazaarMeshCard.jsx";
 import ErrorState from "../components/ErrorState.jsx";
 import { useLanguage } from "../i18n.jsx";
+import { RainIcon, ThermometerIcon, EventIcon, CloudIcon } from "../components/icons.jsx";
 
 const RISK_LABEL_KEYS = {
   protect_cash: "risk_protect_cash",
@@ -81,12 +82,12 @@ export default function Simulate() {
           <button
             onClick={useRealWeather}
             disabled={weatherState === "loading"}
-            className="flex items-center gap-2 text-sm font-medium text-mesh-700 bg-mesh-50 hover:bg-mesh-100 border border-mesh-200 disabled:opacity-60 px-3.5 py-2 rounded-xl transition"
+            className="flex items-center gap-2 text-sm font-medium text-mesh-700 bg-mesh-50 hover:bg-mesh-100 border border-mesh-200 disabled:opacity-60 px-3.5 py-2 rounded-xl transition-all hover:-translate-y-0.5"
           >
             {weatherState === "loading" ? (
               <span className="inline-block w-3.5 h-3.5 border-2 border-mesh-300 border-t-mesh-700 rounded-full animate-spin" />
             ) : (
-              <span aria-hidden="true">🌦️</span>
+              <CloudIcon className="w-4 h-4" />
             )}
             {t("sim_use_real_weather")}
           </button>
@@ -101,7 +102,7 @@ export default function Simulate() {
         <div>
           <div className="flex justify-between text-sm mb-2">
             <label className="font-medium text-ink-700 flex items-center gap-1.5">
-              <span aria-hidden="true">🌧️</span> {t("sim_rain_prob")}
+              <RainIcon className="w-4 h-4 text-ink-400" /> {t("sim_rain_prob")}
             </label>
             <span className="text-ink-500 font-semibold tabular-nums-all">{rainPct}%</span>
           </div>
@@ -120,7 +121,7 @@ export default function Simulate() {
         <div>
           <div className="flex justify-between text-sm mb-2">
             <label className="font-medium text-ink-700 flex items-center gap-1.5">
-              <span aria-hidden="true">🌡️</span> {t("sim_temperature")}
+              <ThermometerIcon className="w-4 h-4 text-ink-400" /> {t("sim_temperature")}
             </label>
             <span className="text-ink-500 font-semibold tabular-nums-all">{temperature}°C</span>
           </div>
@@ -138,7 +139,7 @@ export default function Simulate() {
 
         <div className="flex items-center justify-between">
           <label className="font-medium text-ink-700 text-sm flex items-center gap-1.5">
-            <span aria-hidden="true">🎪</span> {t("sim_local_event")}
+            <EventIcon className="w-4 h-4 text-ink-400" /> {t("sim_local_event")}
           </label>
           <button
             onClick={() => setLocalEvent((v) => !v)}

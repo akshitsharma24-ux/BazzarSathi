@@ -18,7 +18,7 @@ export default function VendorCard({ data }) {
   const rupee = (n) => `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
   return (
-    <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
+    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-mesh-500" />

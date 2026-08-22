@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useLanguage } from "../i18n.jsx";
+import { ReceiptIcon } from "./icons.jsx";
 
 // Prototype only, same spirit as VoiceLogger: real client-side OCR
 // (tesseract.js, loaded on demand so it never weighs down the main
@@ -74,11 +75,11 @@ export default function BillScannerCard() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
+    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h3 className="font-display font-semibold text-ink-900 flex items-center gap-1.5">
-            <span aria-hidden="true">🧾</span> {t("ocr_title")}
+            <ReceiptIcon className="w-4 h-4 text-ink-500" /> {t("ocr_title")}
           </h3>
           <p className="text-sm text-ink-500 mt-0.5 max-w-sm">{t("ocr_subtitle")}</p>
         </div>

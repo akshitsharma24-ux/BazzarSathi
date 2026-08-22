@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { getNeighborhoodInsights } from "../api/client.js";
 import { useLanguage } from "../i18n.jsx";
+import { CompassIcon, RainIcon, CalendarIcon, EventIcon } from "./icons.jsx";
 
-function ImpactRow({ icon, label, pct }) {
+function ImpactRow({ icon: RowIcon, label, pct }) {
   const positive = pct >= 0;
   const magnitude = Math.min(Math.abs(pct), 100);
   return (
     <div className="flex items-center gap-3 py-2">
-      <span className="text-lg w-6 text-center shrink-0" aria-hidden="true">{icon}</span>
+      <span className="w-7 h-7 rounded-full bg-ink-50 flex items-center justify-center shrink-0 text-ink-500">
+        <RowIcon className="w-4 h-4" />
+      </span>
       <span className="w-20 text-sm text-ink-600 shrink-0">{label}</span>
       <div className="flex-1 h-2 bg-ink-100 rounded-full overflow-hidden">
         <div
@@ -34,7 +37,7 @@ export default function BazaarIntelligenceCard() {
 
   if (!data) {
     return (
-      <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
+      <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
         <div className="h-24 rounded-lg skeleton-shimmer" />
       </div>
     );
@@ -45,7 +48,7 @@ export default function BazaarIntelligenceCard() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h3 className="font-display font-semibold text-ink-900 flex items-center gap-1.5">
-            <span aria-hidden="true">🧭</span> {t("neighborhood_title")}
+            <CompassIcon className="w-4 h-4 text-mesh-600" /> {t("neighborhood_title")}
           </h3>
           <p className="text-sm text-ink-500 mt-0.5 max-w-md">{t("neighborhood_subtitle")}</p>
         </div>
@@ -55,9 +58,9 @@ export default function BazaarIntelligenceCard() {
       </div>
 
       <div className="mt-4 divide-y divide-ink-50">
-        <ImpactRow icon="🌧️" label={t("why_rain")} pct={data.rain_impact_pct} />
-        <ImpactRow icon="📅" label={t("why_weekend")} pct={data.weekend_impact_pct} />
-        <ImpactRow icon="🎪" label={t("why_event")} pct={data.event_impact_pct} />
+        <ImpactRow icon={RainIcon} label={t("why_rain")} pct={data.rain_impact_pct} />
+        <ImpactRow icon={CalendarIcon} label={t("why_weekend")} pct={data.weekend_impact_pct} />
+        <ImpactRow icon={EventIcon} label={t("why_event")} pct={data.event_impact_pct} />
       </div>
 
       {data.vendors?.length > 0 && (

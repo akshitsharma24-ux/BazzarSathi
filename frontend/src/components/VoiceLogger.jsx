@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "../i18n.jsx";
+import { MicIcon } from "./icons.jsx";
 
 // Prototype only: converts a spoken (or typed) sentence like "Aaj 91 vada
 // pav bike aur 9 bache" into structured {sold, unsold} numbers, and shows
@@ -109,11 +110,11 @@ export default function VoiceLogger() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
+    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h3 className="font-display font-semibold text-ink-900 flex items-center gap-1.5">
-            <span aria-hidden="true">🎙️</span> {t("voice_title")}
+            <MicIcon className="w-4 h-4 text-ink-500" /> {t("voice_title")}
           </h3>
           <p className="text-sm text-ink-500 mt-0.5 max-w-sm">{t("voice_subtitle")}</p>
         </div>

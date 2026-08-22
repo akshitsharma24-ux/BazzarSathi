@@ -82,6 +82,20 @@ export default {
           "0%": { backgroundPosition: "-400px 0" },
           "100%": { backgroundPosition: "400px 0" },
         },
+        "blob-drift-1": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(4%, 6%) scale(1.08)" },
+          "66%": { transform: "translate(-3%, 3%) scale(0.96)" },
+        },
+        "blob-drift-2": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(-5%, -4%) scale(1.05)" },
+          "66%": { transform: "translate(3%, -5%) scale(0.94)" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both",
@@ -89,6 +103,9 @@ export default {
         "grow-bar": "grow-bar 0.6s cubic-bezier(0.16, 1, 0.3, 1) both",
         "pop": "pop 0.35s cubic-bezier(0.16, 1, 0.3, 1) both",
         "shimmer": "shimmer 1.6s linear infinite",
+        "blob-drift-1": "blob-drift-1 16s ease-in-out infinite",
+        "blob-drift-2": "blob-drift-2 20s ease-in-out infinite",
+        "float": "float 4s ease-in-out infinite",
       },
     },
   },

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { postMeshMatch } from "../api/client.js";
 import { useLanguage } from "../i18n.jsx";
+import { MeshIcon, ZapIcon } from "./icons.jsx";
 
 const SURPLUS_SHORTAGE_THRESHOLD = 5; // units of slack before we call it "balanced"
 
@@ -50,11 +51,11 @@ export default function BazaarMeshCard({ result }) {
   const rupee = (n) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
   return (
-    <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
+    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h3 className="font-display font-semibold text-ink-900 flex items-center gap-1.5">
-            <span aria-hidden="true">🔗</span> {t("mesh_title")}
+            <MeshIcon className="w-4 h-4 text-ink-500" /> {t("mesh_title")}
           </h3>
           <p className="text-sm text-ink-500 mt-1 max-w-sm">{t("mesh_subtitle")}</p>
         </div>
@@ -79,8 +80,8 @@ export default function BazaarMeshCard({ result }) {
         <div className="mt-4 animate-fade-in">
           {response.match_found ? (
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-              <p className="text-xs uppercase tracking-wide text-emerald-700 font-semibold mb-2">
-                ⚡ {t("mesh_match_found")}
+              <p className="text-xs uppercase tracking-wide text-emerald-700 font-semibold mb-2 flex items-center gap-1">
+                <ZapIcon className="w-3.5 h-3.5" /> {t("mesh_match_found")}
               </p>
               <p className="text-sm text-ink-700">
                 <span className="font-semibold">{response.match.vendor_name}</span>{" "}

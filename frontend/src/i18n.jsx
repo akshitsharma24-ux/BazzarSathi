@@ -55,6 +55,9 @@ const STRINGS = {
     model_trained_on: "trained on {n} days of history",
     model_top_driver: "Top driver",
 
+    trend_title: "{n}-Day Sales Trend",
+    trend_subtitle: "Units sold per day — hover a point for details.",
+
     sim_title: "Simulate Tomorrow",
     sim_subtitle: "Set tomorrow's conditions, then run 500 simulated futures to get a Survival Stock recommendation.",
     sim_rain_prob: "Rain probability",
@@ -219,6 +222,9 @@ const STRINGS = {
     model_trained_on: "{n} दिनों के डेटा पर प्रशिक्षित",
     model_top_driver: "मुख्य कारक",
 
+    trend_title: "{n}-दिन की बिक्री का रुझान",
+    trend_subtitle: "हर दिन बिकी यूनिट — विवरण के लिए किसी बिंदु पर होवर करें।",
+
     sim_title: "कल का सिमुलेशन",
     sim_subtitle: "कल की स्थिति सेट करें, फिर 500 सिमुलेशन चलाएं।",
     sim_rain_prob: "बारिश की संभावना",
@@ -382,6 +388,9 @@ const STRINGS = {
     model_r2: "R²",
     model_trained_on: "{n} दिवसांच्या इतिहासावर प्रशिक्षित",
     model_top_driver: "मुख्य घटक",
+
+    trend_title: "{n}-दिवसांचा विक्री कल",
+    trend_subtitle: "दररोज विकलेली युनिट्स — तपशीलासाठी बिंदूवर होवर करा.",
 
     sim_title: "उद्याचं सिम्युलेशन",
     sim_subtitle: "उद्याची परिस्थिती सेट करा, नंतर 500 सिम्युलेटेड भविष्यकाळ चालवून सर्व्हायव्हल स्टॉक मिळवा.",

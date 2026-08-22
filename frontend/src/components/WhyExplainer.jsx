@@ -1,22 +1,26 @@
 import { useLanguage } from "../i18n.jsx";
+import { RainIcon, CalendarIcon, EventIcon, TrendIcon, CoinIcon } from "./icons.jsx";
 
 const DRIVER_META = {
-  rain_impact_pct: { labelKey: "why_rain", icon: "🌧️" },
-  weekend_impact_pct: { labelKey: "why_weekend", icon: "📅" },
-  event_impact_pct: { labelKey: "why_event", icon: "🎪" },
-  trend_impact_pct: { labelKey: "why_trend", icon: "📈" },
+  rain_impact_pct: { labelKey: "why_rain", Icon: RainIcon },
+  weekend_impact_pct: { labelKey: "why_weekend", Icon: CalendarIcon },
+  event_impact_pct: { labelKey: "why_event", Icon: EventIcon },
+  trend_impact_pct: { labelKey: "why_trend", Icon: TrendIcon },
 };
 
 function DriverRow({ driverKey, pct, t }) {
   const meta = DRIVER_META[driverKey];
   if (!meta) return null;
+  const { Icon } = meta;
 
   const positive = pct >= 0;
   const magnitude = Math.min(Math.abs(pct), 100);
 
   return (
     <div className="flex items-center gap-3 py-2.5">
-      <span className="text-xl w-7 text-center shrink-0" aria-hidden="true">{meta.icon}</span>
+      <span className="w-7 h-7 rounded-full bg-ink-50 flex items-center justify-center shrink-0 text-ink-500">
+        <Icon className="w-4 h-4" />
+      </span>
       <span className="w-24 sm:w-28 text-sm text-ink-600 shrink-0">{t(meta.labelKey)}</span>
       <div className="flex-1 h-2 bg-ink-100 rounded-full overflow-hidden">
         <div
@@ -41,7 +45,7 @@ export default function WhyExplainer({ why, riskModeLabel }) {
   if (!why) return null;
 
   return (
-    <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
+    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
       <h3 className="font-display font-semibold text-ink-900 mb-1">{t("why_title")}</h3>
       <p className="text-sm text-ink-500 mb-1">{t("why_subtitle")}</p>
       <div className="divide-y divide-ink-50">
@@ -51,7 +55,9 @@ export default function WhyExplainer({ why, riskModeLabel }) {
       </div>
       {riskModeLabel && (
         <div className="mt-2 pt-3 border-t border-ink-100 flex items-center justify-between text-sm">
-          <span className="text-ink-500">💰 {t("why_risk_mode")}</span>
+          <span className="text-ink-500 flex items-center gap-1.5">
+            <CoinIcon className="w-4 h-4 text-ink-400" /> {t("why_risk_mode")}
+          </span>
           <span className="font-semibold text-ink-800">{riskModeLabel}</span>
         </div>
       )}
