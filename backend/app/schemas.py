@@ -52,6 +52,19 @@ class SimulateResponse(BaseModel):
     risk_mode: str
 
 
+class FeatureImportance(BaseModel):
+    feature: str
+    importance: float
+
+
+class ModelInfoResponse(BaseModel):
+    mae: float
+    rmse: float
+    r2: float
+    trained_rows: int
+    top_features: list[FeatureImportance]
+
+
 class MeshMatchRequest(BaseModel):
     direction: str = Field(pattern="^(surplus|shortage|balanced)$")
     quantity: int = Field(ge=0)

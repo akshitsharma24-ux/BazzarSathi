@@ -14,6 +14,7 @@ Run directly to train + evaluate + save model.pkl:
     python -m app.models.forecast_model
 """
 
+import json
 import os
 
 import joblib
@@ -26,6 +27,7 @@ from sklearn.model_selection import train_test_split
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(CURRENT_DIR, "..", "data", "vendor_sales.csv")
 MODEL_PATH = os.path.join(CURRENT_DIR, "model.pkl")
+METRICS_PATH = os.path.join(CURRENT_DIR, "metrics.json")
 
 FEATURE_COLUMNS = [
     "day_of_week",
@@ -80,6 +82,26 @@ def save_model(model, path: str = MODEL_PATH) -> None:
     joblib.dump({"model": model, "features": FEATURE_COLUMNS}, path)
 
 
+def save_metrics(
+    metrics: dict, feature_importances: dict, trained_rows: int, path: str = METRICS_PATH
+) -> None:
+    """Persists training-time metrics so the API can expose them (GET
+    /model-info) without needing to retrain or hold a training frame in
+    memory at request time."""
+    payload = {
+        "mae": round(metrics["mae"], 2),
+        "rmse": round(metrics["rmse"], 2),
+        "r2": round(metrics["r2"], 3),
+        "trained_rows": trained_rows,
+        "top_features": [
+            {"feature": feat, "importance": round(imp, 3)}
+            for feat, imp in sorted(feature_importances.items(), key=lambda x: -x[1])[:4]
+        ],
+    }
+    with open(path, "w") as f:
+        json.dump(payload, f, indent=2)
+
+
 def load_model(path: str = MODEL_PATH):
     bundle = joblib.load(path)
     return bundle["model"], bundle["features"]
@@ -114,14 +136,16 @@ if __name__ == "__main__":
     model, metrics = train_model(df)
     save_model(model)
 
+    feature_importances = dict(zip(FEATURE_COLUMNS, model.feature_importances_))
+    save_metrics(metrics, feature_importances, trained_rows=len(df))
+
     print(f"Trained RandomForestRegressor on {len(df)} rows")
     print(f"  MAE:  {metrics['mae']:.2f} units")
     print(f"  RMSE: {metrics['rmse']:.2f} units")
     print(f"  R2:   {metrics['r2']:.3f}")
     print(f"Model saved -> {MODEL_PATH}")
+    print(f"Metrics saved -> {METRICS_PATH}")
 
     print("\nFeature importances:")
-    for feat, imp in sorted(
-        zip(FEATURE_COLUMNS, model.feature_importances_), key=lambda x: -x[1]
-    ):
+    for feat, imp in sorted(feature_importances.items(), key=lambda x: -x[1]):
         print(f"  {feat:<20s} {imp:.3f}")

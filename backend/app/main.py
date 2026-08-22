@@ -9,7 +9,7 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
-from app.routers import dashboard, forecast, mesh, simulate
+from app.routers import dashboard, forecast, mesh, model_info, simulate
 
 app = FastAPI(
     title="BazaarSaathi API",
@@ -48,6 +48,7 @@ for prefix in ("", "/api"):
     app.include_router(forecast.router, prefix=prefix, tags=["forecast"])
     app.include_router(simulate.router, prefix=prefix, tags=["simulate"])
     app.include_router(mesh.router, prefix=prefix, tags=["mesh"])
+    app.include_router(model_info.router, prefix=prefix, tags=["model-info"])
 
 
 @app.get("/")

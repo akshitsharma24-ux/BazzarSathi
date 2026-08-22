@@ -1,0 +1,24 @@
+{
+  "mae": 7.03,
+  "rmse": 8.62,
+  "r2": 0.81,
+  "trained_rows": 150,
+  "top_features": [
+    {
+      "feature": "local_event",
+      "importance": 0.459
+    },
+    {
+      "feature": "day_of_week",
+      "importance": 0.172
+    },
+    {
+      "feature": "weekend",
+      "importance": 0.13
+    },
+    {
+      "feature": "rainfall",
+      "importance": 0.086
+    }
+  ]
+}
