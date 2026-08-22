@@ -131,6 +131,17 @@ const STRINGS = {
     chart_title: "Simulated demand across 500 possible tomorrows",
     chart_subtitle: "Each bar is how often that demand level showed up across the simulations.",
     chart_marker_label: "Survival Stock",
+
+    voice_title: "Log today's sales (voice)",
+    voice_subtitle: "Speak a sentence like “Sold 91, 9 left” — no typing needed.",
+    voice_start: "Tap to speak",
+    voice_listening: "Listening...",
+    voice_unsupported: "Voice input isn't supported in this browser. Type the sentence instead:",
+    voice_placeholder: "e.g. Sold 91, 9 left",
+    voice_parse: "Parse",
+    voice_mic_error: "Couldn't hear anything — check microphone access, or type it instead.",
+    voice_no_numbers: "Couldn't find any numbers in that — try again with quantities.",
+    voice_demo_note: "Prototype only — shown for accessibility demo purposes, not saved to the dashboard.",
   },
   hi: {
     appName: "BazaarSaathi",
@@ -262,6 +273,17 @@ const STRINGS = {
     chart_title: "500 संभावित कल के अनुमानित मांग",
     chart_subtitle: "हर बार वह मांग स्तर कितनी बार आया।",
     chart_marker_label: "सर्वाइवल स्टॉक",
+
+    voice_title: "आज की बिक्री बोलकर दर्ज करें",
+    voice_subtitle: "बोलें जैसे “91 बिके, 9 बचे” — टाइप करने की जरूरत नहीं।",
+    voice_start: "बोलने के लिए दबाएं",
+    voice_listening: "सुन रहे हैं...",
+    voice_unsupported: "इस ब्राउज़र में आवाज़ इनपुट उपलब्ध नहीं है। इसके बजाय टाइप करें:",
+    voice_placeholder: "जैसे: 91 बिके, 9 बचे",
+    voice_parse: "पार्स करें",
+    voice_mic_error: "कुछ सुनाई नहीं दिया — माइक्रोफ़ोन जांचें, या टाइप करें।",
+    voice_no_numbers: "कोई संख्या नहीं मिली — मात्रा के साथ फिर कोशिश करें।",
+    voice_demo_note: "केवल प्रोटोटाइप — डैशबोर्ड में सेव नहीं होता, सिर्फ प्रदर्शन के लिए।",
   },
 };
 
