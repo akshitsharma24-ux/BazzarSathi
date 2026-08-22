@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { postMeshMatch } from "../api/client.js";
+import { useLanguage } from "../i18n.jsx";
 
 const SURPLUS_SHORTAGE_THRESHOLD = 5; // units of slack before we call it "balanced"
 
 function deriveOurStatus(result) {
   const distribution = result.demand_distribution;
-  const meanDemand =
-    distribution.reduce((sum, v) => sum + v, 0) / distribution.length;
+  const meanDemand = distribution.reduce((sum, v) => sum + v, 0) / distribution.length;
   const diff = result.recommended_stock - meanDemand; // positive = likely surplus
 
   if (diff > SURPLUS_SHORTAGE_THRESHOLD) {
@@ -19,6 +19,7 @@ function deriveOurStatus(result) {
 }
 
 export default function BazaarMeshCard({ result }) {
+  const { t } = useLanguage();
   const [state, setState] = useState("idle"); // idle | loading | done | error
   const [response, setResponse] = useState(null);
   const [ourStatus, setOurStatus] = useState(null);
@@ -41,7 +42,7 @@ export default function BazaarMeshCard({ result }) {
       const data = await postMeshMatch(status);
       setResponse(data);
       setState("done");
-    } catch (e) {
+    } catch {
       setState("error");
     }
   }
@@ -49,73 +50,71 @@ export default function BazaarMeshCard({ result }) {
   const rupee = (n) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h3 className="font-semibold text-gray-800">Bazaar Mesh</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            See if a nearby vendor can absorb your surplus, or cover your shortage, today.
-          </p>
+          <h3 className="font-display font-semibold text-ink-900 flex items-center gap-1.5">
+            <span aria-hidden="true">🔗</span> {t("mesh_title")}
+          </h3>
+          <p className="text-sm text-ink-500 mt-1 max-w-sm">{t("mesh_subtitle")}</p>
         </div>
         {state !== "done" && (
           <button
             onClick={handleCheck}
             disabled={state === "loading"}
-            className="shrink-0 bg-gray-800 hover:bg-gray-900 disabled:bg-gray-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+            className="shrink-0 bg-ink-900 hover:bg-ink-800 disabled:bg-ink-300 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition"
           >
-            {state === "loading" ? "Checking nearby vendors..." : "Check nearby vendors"}
+            {state === "loading" ? t("mesh_checking") : t("mesh_check_button")}
           </button>
         )}
       </div>
 
       {state === "error" && (
-        <p className="mt-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg p-3">
-          Couldn't reach Bazaar Mesh right now. Try again in a moment.
+        <p className="mt-4 text-sm text-rose-500 bg-rose-50 border border-rose-200 rounded-xl p-3">
+          {t("mesh_error")}
         </p>
       )}
 
       {state === "done" && response && (
-        <div className="mt-4">
+        <div className="mt-4 animate-fade-in">
           {response.match_found ? (
-            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-              <p className="text-xs uppercase tracking-wide text-green-700 font-semibold mb-2">
-                ✅ Surplus Match Found
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+              <p className="text-xs uppercase tracking-wide text-emerald-700 font-semibold mb-2">
+                ⚡ {t("mesh_match_found")}
               </p>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-ink-700">
                 <span className="font-semibold">{response.match.vendor_name}</span>{" "}
-                is only <span className="font-semibold">{response.match.distance_m}m</span> away
-                and {response.match.their_status === "shortage" ? "is short on" : "has surplus"}{" "}
-                <span className="font-semibold">{response.item}</span> today.
+                <span className="font-semibold">{response.match.distance_m}m</span> {t("mesh_away")} ·{" "}
+                {response.match.their_status === "shortage" ? t("mesh_short_on") : t("mesh_has_surplus")}{" "}
+                <span className="font-semibold">{response.item}</span>.
               </p>
               <div className="grid grid-cols-2 gap-4 mt-3">
                 <div>
-                  <p className="text-xs text-gray-400">Quantity matched</p>
-                  <p className="text-lg font-bold text-gray-800">
-                    {response.match.matched_quantity} units
+                  <p className="text-xs text-ink-400">{t("mesh_qty_matched")}</p>
+                  <p className="text-lg font-display font-bold text-ink-800 tabular-nums-all">
+                    {response.match.matched_quantity} {t("survival_units")}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Estimated value recovered</p>
-                  <p className="text-lg font-bold text-green-700">
+                  <p className="text-xs text-ink-400">{t("mesh_value_recovered")}</p>
+                  <p className="text-lg font-display font-bold text-emerald-700 tabular-nums-all">
                     {rupee(response.match.estimated_value_recovered)}
                   </p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <p className="text-sm text-gray-600">
-                {ourStatus?.direction === "balanced"
-                  ? "Today's numbers look balanced — no surplus or shortage to match."
-                  : "No nearby vendor match found for today's surplus/shortage."}
+            <div className="rounded-xl border border-ink-100 bg-ink-50 p-4">
+              <p className="text-sm text-ink-600">
+                {ourStatus?.direction === "balanced" ? t("mesh_balanced") : t("mesh_no_match")}
               </p>
             </div>
           )}
           <button
             onClick={() => setState("idle")}
-            className="mt-3 text-xs text-gray-400 hover:text-gray-600 underline"
+            className="mt-3 text-xs text-ink-400 hover:text-ink-600 underline"
           >
-            Check again
+            {t("mesh_check_again")}
           </button>
         </div>
       )}

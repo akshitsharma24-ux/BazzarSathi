@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { postSimulate } from "../api/client.js";
 import SimulateButton from "../components/SimulateButton.jsx";
+import SimulationSummary from "../components/SimulationSummary.jsx";
 import DemandChart from "../components/DemandChart.jsx";
 import SurvivalStockCard from "../components/SurvivalStockCard.jsx";
 import StockComparisonTable from "../components/StockComparisonTable.jsx";
@@ -9,8 +10,16 @@ import WhyExplainer from "../components/WhyExplainer.jsx";
 import SavingsCalculator from "../components/SavingsCalculator.jsx";
 import BazaarMeshCard from "../components/BazaarMeshCard.jsx";
 import ErrorState from "../components/ErrorState.jsx";
+import { useLanguage } from "../i18n.jsx";
+
+const RISK_LABEL_KEYS = {
+  protect_cash: "risk_protect_cash",
+  balanced: "risk_balanced",
+  maximize_sales: "risk_maximize_sales",
+};
 
 export default function Simulate() {
+  const { t } = useLanguage();
   const [rainProbability, setRainProbability] = useState(0.3);
   const [temperature, setTemperature] = useState(30);
   const [localEvent, setLocalEvent] = useState(false);
@@ -25,12 +34,7 @@ export default function Simulate() {
     setLoading(true);
     setError(null);
     try {
-      const data = await postSimulate({
-        rainProbability,
-        temperature,
-        localEvent,
-        riskMode: mode,
-      });
+      const data = await postSimulate({ rainProbability, temperature, localEvent, riskMode: mode });
       setResult(data);
       setHasSimulated(true);
     } catch (e) {
@@ -45,20 +49,23 @@ export default function Simulate() {
     if (hasSimulated) runSimulation(mode);
   }
 
+  const rainPct = Math.round(rainProbability * 100);
+  const tempPct = Math.round(((temperature - 15) / (42 - 15)) * 100);
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Simulate Tomorrow</h1>
-        <p className="text-gray-500 mt-1">
-          Set tomorrow's conditions, then run 500 simulated futures to get a Survival Stock recommendation.
-        </p>
+        <h1 className="text-2xl sm:text-3xl font-display font-bold text-ink-900">{t("sim_title")}</h1>
+        <p className="text-ink-500 mt-1">{t("sim_subtitle")}</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
+      <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 space-y-6 animate-fade-up">
         <div>
-          <div className="flex justify-between text-sm mb-1">
-            <label className="font-medium text-gray-700">Rain probability</label>
-            <span className="text-gray-500">{Math.round(rainProbability * 100)}%</span>
+          <div className="flex justify-between text-sm mb-2">
+            <label className="font-medium text-ink-700 flex items-center gap-1.5">
+              <span aria-hidden="true">🌧️</span> {t("sim_rain_prob")}
+            </label>
+            <span className="text-ink-500 font-semibold tabular-nums-all">{rainPct}%</span>
           </div>
           <input
             type="range"
@@ -67,14 +74,17 @@ export default function Simulate() {
             step="0.05"
             value={rainProbability}
             onChange={(e) => setRainProbability(parseFloat(e.target.value))}
-            className="w-full accent-saathi-600"
+            style={{ "--range-pct": rainPct }}
+            className="w-full"
           />
         </div>
 
         <div>
-          <div className="flex justify-between text-sm mb-1">
-            <label className="font-medium text-gray-700">Temperature</label>
-            <span className="text-gray-500">{temperature}°C</span>
+          <div className="flex justify-between text-sm mb-2">
+            <label className="font-medium text-ink-700 flex items-center gap-1.5">
+              <span aria-hidden="true">🌡️</span> {t("sim_temperature")}
+            </label>
+            <span className="text-ink-500 font-semibold tabular-nums-all">{temperature}°C</span>
           </div>
           <input
             type="range"
@@ -83,17 +93,18 @@ export default function Simulate() {
             step="1"
             value={temperature}
             onChange={(e) => setTemperature(parseFloat(e.target.value))}
-            className="w-full accent-saathi-600"
+            style={{ "--range-pct": tempPct }}
+            className="w-full"
           />
         </div>
 
         <div className="flex items-center justify-between">
-          <label className="font-medium text-gray-700 text-sm">Local event tomorrow?</label>
+          <label className="font-medium text-ink-700 text-sm flex items-center gap-1.5">
+            <span aria-hidden="true">🎪</span> {t("sim_local_event")}
+          </label>
           <button
             onClick={() => setLocalEvent((v) => !v)}
-            className={`relative w-12 h-6 rounded-full transition ${
-              localEvent ? "bg-saathi-600" : "bg-gray-200"
-            }`}
+            className={`relative w-12 h-6 rounded-full transition ${localEvent ? "bg-saathi-600" : "bg-ink-200"}`}
           >
             <span
               className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
@@ -110,23 +121,20 @@ export default function Simulate() {
 
       {result && (
         <>
+          <SimulationSummary distribution={result.demand_distribution} />
           <RiskPersonalityToggle value={riskMode} onChange={handleRiskChange} disabled={loading} />
           <SurvivalStockCard result={result} />
           <StockComparisonTable
             stockLevelStats={result.stock_level_stats}
             recommendedStock={result.recommended_stock}
           />
-          <DemandChart
-            distribution={result.demand_distribution}
-            recommendedStock={result.recommended_stock}
-          />
-          <WhyExplainer why={result.why_breakdown} />
+          <DemandChart distribution={result.demand_distribution} recommendedStock={result.recommended_stock} />
+          <WhyExplainer why={result.why_breakdown} riskModeLabel={t(RISK_LABEL_KEYS[result.risk_mode])} />
           <SavingsCalculator savings={result.savings} />
           <BazaarMeshCard result={result} />
 
-          <p className="text-center text-sm text-gray-400 italic pt-2 pb-4">
-            Prediction tells a vendor what may happen. BazaarSaathi helps them
-            survive when the prediction is wrong.
+          <p className="text-center text-sm text-ink-400 italic pt-2 pb-4 max-w-md mx-auto leading-relaxed">
+            {t("sim_closing_line")}
           </p>
         </>
       )}

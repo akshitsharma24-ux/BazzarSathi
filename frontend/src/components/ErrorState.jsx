@@ -1,15 +1,19 @@
+import { useLanguage } from "../i18n.jsx";
+
 export default function ErrorState({ message, onRetry }) {
+  const { t } = useLanguage();
   return (
-    <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-600 flex items-center justify-between gap-4 flex-wrap">
+    <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 text-sm text-rose-600 flex items-center justify-between gap-4 flex-wrap animate-fade-in">
       <span>
-        Something went wrong{message ? `: ${message}.` : "."} Please try again.
+        {t("error_generic")}
+        {message ? `: ${message}.` : "."} {t("error_please_retry")}
       </span>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="shrink-0 bg-white border border-red-300 text-red-600 hover:bg-red-100 font-medium text-xs px-3 py-1.5 rounded-md transition"
+          className="shrink-0 bg-white border border-rose-300 text-rose-600 hover:bg-rose-100 font-medium text-xs px-3 py-1.5 rounded-lg transition"
         >
-          Try again
+          {t("error_retry")}
         </button>
       )}
     </div>

@@ -1,49 +1,59 @@
+import { useLanguage } from "../i18n.jsx";
+
 function Stat({ label, value, accent }) {
   return (
     <div className="flex flex-col">
-      <span className="text-xs uppercase tracking-wide text-gray-400">{label}</span>
-      <span className={`text-2xl font-bold ${accent || "text-gray-900"}`}>{value}</span>
+      <span className="text-[11px] uppercase tracking-wide text-ink-400 font-medium">{label}</span>
+      <span className={`text-2xl sm:text-3xl font-display font-bold tabular-nums-all ${accent || "text-ink-900"}`}>
+        {value}
+      </span>
     </div>
   );
 }
 
 export default function VendorCard({ data }) {
+  const { t } = useLanguage();
   if (!data) return null;
 
   const rupee = (n) => `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">Today's Snapshot</h2>
-        <span className="text-sm text-gray-400">{data.date}</span>
+    <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-mesh-500" />
+          <h2 className="text-lg font-display font-semibold text-ink-900">{t("dash_today_snapshot")}</h2>
+        </div>
+        <span className="text-sm text-ink-400 font-medium">{data.date}</span>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-        <Stat label="Prepared" value={data.units_prepared} />
-        <Stat label="Sold" value={data.units_sold} accent="text-green-600" />
-        <Stat label="Unsold" value={data.units_unsold} accent="text-red-500" />
-        <Stat label="Profit" value={rupee(data.profit)} accent="text-saathi-700" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-6">
+        <Stat label={t("dash_prepared")} value={data.units_prepared} />
+        <Stat label={t("dash_sold")} value={data.units_sold} accent="text-mesh-600" />
+        <Stat label={t("dash_unsold")} value={data.units_unsold} accent="text-rose-500" />
+        <Stat label={t("dash_profit")} value={rupee(data.profit)} accent="text-saathi-700" />
       </div>
 
-      <div className="mt-5 pt-4 border-t border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
+      <div className="mt-5 pt-4 border-t border-ink-100 grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-6 text-sm">
         <div>
-          <span className="text-gray-400">Revenue</span>
-          <p className="font-medium">{rupee(data.revenue)}</p>
+          <span className="text-ink-400 text-xs">{t("dash_revenue")}</span>
+          <p className="font-semibold text-ink-800 mt-0.5 tabular-nums-all">{rupee(data.revenue)}</p>
         </div>
         <div>
-          <span className="text-gray-400">Waste loss</span>
-          <p className="font-medium text-red-500">{rupee(data.waste_loss)}</p>
+          <span className="text-ink-400 text-xs">{t("dash_waste_loss")}</span>
+          <p className="font-semibold text-rose-500 mt-0.5 tabular-nums-all">{rupee(data.waste_loss)}</p>
         </div>
         <div>
-          <span className="text-gray-400">Rain probability</span>
-          <p className="font-medium">{Math.round(data.rain_probability * 100)}%</p>
+          <span className="text-ink-400 text-xs">{t("dash_rain_prob")}</span>
+          <p className="font-semibold text-ink-800 mt-0.5 tabular-nums-all">
+            {Math.round(data.rain_probability * 100)}%
+          </p>
         </div>
         <div>
-          <span className="text-gray-400">Conditions</span>
-          <p className="font-medium">
-            {data.weekend ? "Weekend" : "Weekday"}
-            {data.local_event ? " · Event" : ""}
+          <span className="text-ink-400 text-xs">{t("dash_conditions")}</span>
+          <p className="font-semibold text-ink-800 mt-0.5">
+            {data.weekend ? t("dash_weekend") : t("dash_weekday")}
+            {data.local_event ? ` · ${t("dash_event")}` : ""}
           </p>
         </div>
       </div>

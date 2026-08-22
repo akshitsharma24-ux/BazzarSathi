@@ -1,52 +1,48 @@
-function buildHistogram(values, binCount = 16) {
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
-  const binWidth = range / binCount;
-
-  const bins = Array.from({ length: binCount }, (_, i) => ({
-    start: min + i * binWidth,
-    end: min + (i + 1) * binWidth,
-    count: 0,
-  }));
-
-  for (const v of values) {
-    let idx = Math.floor((v - min) / binWidth);
-    if (idx >= binCount) idx = binCount - 1;
-    if (idx < 0) idx = 0;
-    bins[idx].count += 1;
-  }
-
-  return { bins, min, max };
-}
+import { useLanguage } from "../i18n.jsx";
+import { buildHistogram } from "../utils/stats.js";
 
 export default function DemandChart({ distribution, recommendedStock }) {
+  const { t } = useLanguage();
   if (!distribution || distribution.length === 0) return null;
 
   const { bins, min, max } = buildHistogram(distribution);
   const maxCount = Math.max(...bins.map((b) => b.count));
-  const chartHeight = 160;
+  const chartHeight = 170;
   const chartWidth = 560;
-  const barGap = 2;
+  const barGap = 2.5;
   const barWidth = chartWidth / bins.length - barGap;
 
-  const recommendedX =
-    ((recommendedStock - min) / (max - min || 1)) * chartWidth;
+  const recommendedX = ((recommendedStock - min) / (max - min || 1)) * chartWidth;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <h3 className="font-semibold text-gray-800 mb-1">
-        Simulated demand across 500 possible tomorrows
-      </h3>
-      <p className="text-sm text-gray-500 mb-4">
-        Each bar is how often that demand level showed up across the simulations.
-      </p>
+    <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
+      <h3 className="font-display font-semibold text-ink-900">{t("chart_title")}</h3>
+      <p className="text-sm text-ink-500 mb-4">{t("chart_subtitle")}</p>
 
       <svg
-        viewBox={`0 0 ${chartWidth} ${chartHeight + 30}`}
+        viewBox={`0 0 ${chartWidth} ${chartHeight + 34}`}
         className="w-full"
         preserveAspectRatio="xMidYMid meet"
       >
+        <defs>
+          <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f18d3a" />
+            <stop offset="100%" stopColor="#dd5612" />
+          </linearGradient>
+        </defs>
+
+        {[0.25, 0.5, 0.75].map((f) => (
+          <line
+            key={f}
+            x1={0}
+            x2={chartWidth}
+            y1={chartHeight * f}
+            y2={chartHeight * f}
+            stroke="#efece7"
+            strokeWidth={1}
+          />
+        ))}
+
         {bins.map((bin, i) => {
           const h = maxCount ? (bin.count / maxCount) * chartHeight : 0;
           const x = i * (barWidth + barGap);
@@ -58,8 +54,14 @@ export default function DemandChart({ distribution, recommendedStock }) {
               y={y}
               width={barWidth}
               height={h}
-              rx={2}
-              className="fill-saathi-500/70"
+              rx={3}
+              fill="url(#barGradient)"
+              style={{
+                transformBox: "fill-box",
+                transformOrigin: "bottom",
+                animation: "grow-bar 0.5s cubic-bezier(0.16,1,0.3,1) both",
+                animationDelay: `${i * 12}ms`,
+              }}
             />
           );
         })}
@@ -71,25 +73,34 @@ export default function DemandChart({ distribution, recommendedStock }) {
               x2={recommendedX}
               y1={0}
               y2={chartHeight}
-              stroke="#9a3412"
+              stroke="#211d18"
               strokeWidth={2}
               strokeDasharray="4 3"
             />
+            <rect
+              x={Math.min(Math.max(recommendedX - 72, 0), chartWidth - 144)}
+              y={chartHeight + 8}
+              width={144}
+              height={20}
+              rx={10}
+              fill="#211d18"
+            />
             <text
-              x={Math.min(Math.max(recommendedX, 40), chartWidth - 40)}
-              y={chartHeight + 20}
+              x={Math.min(Math.max(recommendedX, 72), chartWidth - 72)}
+              y={chartHeight + 22}
               textAnchor="middle"
-              className="fill-saathi-700 text-[11px] font-medium"
+              fill="white"
+              className="text-[11px] font-semibold"
             >
-              Survival Stock: {recommendedStock}
+              {t("chart_marker_label")}: {recommendedStock}
             </text>
           </g>
         )}
       </svg>
 
-      <div className="flex justify-between text-xs text-gray-400 mt-1">
-        <span>{Math.round(min)} units</span>
-        <span>{Math.round(max)} units</span>
+      <div className="flex justify-between text-xs text-ink-400 mt-1">
+        <span>{Math.round(min)} {t("futures_units")}</span>
+        <span>{Math.round(max)} {t("futures_units")}</span>
       </div>
     </div>
   );

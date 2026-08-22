@@ -25,6 +25,11 @@ export async function getForecast({ rainProbability, temperature, localEvent }) 
   return handle(res);
 }
 
+export async function getModelInfo() {
+  const res = await fetch(`${API_BASE}/model-info`);
+  return handle(res);
+}
+
 export async function postMeshMatch({ direction, quantity }) {
   const res = await fetch(`${API_BASE}/mesh/match`, {
     method: "POST",

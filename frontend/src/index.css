@@ -2,6 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  @apply bg-gray-50 text-gray-900;
+  @apply bg-ink-50 text-ink-900 font-sans antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: theme("fontFamily.display");
+}
+
+/* Subtle dotted-grain texture used behind hero/landing sections. */
+.bg-textured {
+  background-image: theme("backgroundImage.grain");
+  background-size: theme("backgroundSize.grain");
+}
+
+/* Tabular numerals for stat displays so digits don't jitter in width. */
+.tabular-nums-all {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background-color: theme("colors.saathi.200");
+  color: theme("colors.saathi.900");
+}
+
+/* Custom range slider so it matches the rest of the system instead of the
+   browser default track/thumb. */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    theme("colors.saathi.500") 0%,
+    theme("colors.saathi.500") calc(var(--range-pct, 50) * 1%),
+    theme("colors.ink.200") calc(var(--range-pct, 50) * 1%),
+    theme("colors.ink.200") 100%
+  );
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid theme("colors.saathi.600");
+  box-shadow: 0 1px 3px rgba(33, 29, 24, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid theme("colors.saathi.600");
+  box-shadow: 0 1px 3px rgba(33, 29, 24, 0.25);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: theme("colors.ink.200");
+}
+
+/* Skeleton shimmer sweep. */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    theme("colors.ink.100") 0%,
+    theme("colors.ink.50") 50%,
+    theme("colors.ink.100") 100%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
 }
