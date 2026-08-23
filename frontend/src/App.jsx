@@ -2,18 +2,22 @@ import { useState } from "react";
 import Landing from "./pages/Landing.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Simulate from "./pages/Simulate.jsx";
+import Network from "./pages/Network.jsx";
 import { useLanguage } from "./i18n.jsx";
 
-function LogoMark() {
+// Simplified crest mark echoing the brand logo: a market stall awning on
+// top of a shield, in the app's own teal/orange pair -- abstracted down to
+// something legible at 30px instead of the full illustrated version.
+function LogoMark({ size = 30 }) {
   return (
-    <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <rect width="32" height="32" rx="9" fill="#dd5612" />
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <path d="M6 14.5 16 3l10 11.5v11.5a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V14.5Z" fill="#1c7c76" />
       <path
-        d="M9 13.5C9 12.1 10.1 11 11.5 11h9c1.4 0 2.5 1.1 2.5 2.5v.3c0 .8-.4 1.6-1.1 2.1l-1 .7c-.4.3-.6.7-.6 1.2v2.7c0 1.4-1.1 2.5-2.5 2.5h-6.6c-1.4 0-2.5-1.1-2.5-2.5v-2.7c0-.5-.2-.9-.6-1.2l-1-.7c-.7-.5-1.1-1.3-1.1-2.1v-.3Z"
-        fill="white"
+        d="M5 15 6.6 9h18.8L27 15a3 3 0 0 1-3 2.6 3 3 0 0 1-2.4-1.2A3 3 0 0 1 19.2 18a3 3 0 0 1-2.4-1.2 3 3 0 0 1-2.4 1.2 3 3 0 0 1-2.4-1.2A3 3 0 0 1 8 17.6 3 3 0 0 1 5 15Z"
+        fill="#dd5612"
       />
-      <circle cx="12.5" cy="22.5" r="1.4" fill="white" />
-      <circle cx="19.5" cy="22.5" r="1.4" fill="white" />
+      <path d="M6.6 9 8.3 4h15.4L25.4 9H6.6Z" fill="#f18d3a" />
+      <circle cx="16" cy="24" r="2.6" fill="#fef6ee" />
     </svg>
   );
 }
@@ -43,46 +47,50 @@ function LanguageToggle() {
   );
 }
 
+const NAV_TABS = [
+  { key: "dashboard", labelKey: "nav_dashboard" },
+  { key: "simulate", labelKey: "nav_simulate" },
+  { key: "network", labelKey: "nav_network" },
+];
+
 export default function App() {
   const [page, setPage] = useState("landing");
+  const [simResult, setSimResult] = useState(null);
   const { t } = useLanguage();
 
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-white/80 backdrop-blur-md border-b border-ink-100 sticky top-0 z-20">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <button onClick={() => setPage("landing")} className="flex items-center gap-2.5 group shrink-0">
-            <LogoMark />
-            <span className="font-display font-bold text-lg text-ink-900 tracking-tight group-hover:text-saathi-600 transition-colors">
-              {t("appName")}
-            </span>
-          </button>
+        <div className="max-w-5xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <button onClick={() => setPage("landing")} className="flex items-center gap-2.5 group shrink-0">
+              <LogoMark />
+              <span className="font-display font-bold text-lg text-ink-900 tracking-tight group-hover:text-saathi-600 transition-colors">
+                {t("appName")}
+              </span>
+            </button>
+            <div className="sm:hidden">
+              <LanguageToggle />
+            </div>
+          </div>
 
-          <div className="flex items-center gap-3">
-            {page !== "landing" && (
-              <nav className="flex gap-1 bg-ink-100 rounded-full p-1">
+          {page !== "landing" && (
+            <nav className="flex gap-1 bg-ink-100 rounded-full p-1 w-full sm:w-auto">
+              {NAV_TABS.map(({ key, labelKey }) => (
                 <button
-                  onClick={() => setPage("dashboard")}
-                  className={`px-3.5 sm:px-4 py-1.5 rounded-full text-sm font-medium transition ${
-                    page === "dashboard"
-                      ? "bg-white shadow-sm text-saathi-700"
-                      : "text-ink-500 hover:text-ink-700"
+                  key={key}
+                  onClick={() => setPage(key)}
+                  className={`flex-1 sm:flex-initial px-2 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition text-center whitespace-nowrap ${
+                    page === key ? "bg-white shadow-sm text-saathi-700" : "text-ink-500 hover:text-ink-700"
                   }`}
                 >
-                  {t("nav_dashboard")}
+                  {t(labelKey)}
                 </button>
-                <button
-                  onClick={() => setPage("simulate")}
-                  className={`px-3.5 sm:px-4 py-1.5 rounded-full text-sm font-medium transition ${
-                    page === "simulate"
-                      ? "bg-white shadow-sm text-saathi-700"
-                      : "text-ink-500 hover:text-ink-700"
-                  }`}
-                >
-                  {t("nav_simulate")}
-                </button>
-              </nav>
-            )}
+              ))}
+            </nav>
+          )}
+
+          <div className="hidden sm:block shrink-0">
             <LanguageToggle />
           </div>
         </div>
@@ -91,7 +99,10 @@ export default function App() {
       <main className="max-w-5xl mx-auto px-4 py-6 sm:py-8 flex-1 w-full">
         {page === "landing" && <Landing onEnter={() => setPage("dashboard")} />}
         {page === "dashboard" && <Dashboard onGoToSimulate={() => setPage("simulate")} />}
-        {page === "simulate" && <Simulate />}
+        {page === "simulate" && (
+          <Simulate onSimulated={setSimResult} onGoToNetwork={() => setPage("network")} />
+        )}
+        {page === "network" && <Network simResult={simResult} onGoToSimulate={() => setPage("simulate")} />}
       </main>
 
       <footer className="max-w-5xl mx-auto px-4 py-6 text-xs text-ink-400 text-center w-full">

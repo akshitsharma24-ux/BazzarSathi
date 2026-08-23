@@ -3,8 +3,10 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 const STRINGS = {
   en: {
     appName: "BazaarSaathi",
+    brand_tagline: "Right Stock. Right Decision. Better Tomorrow.",
     nav_dashboard: "Dashboard",
     nav_simulate: "Simulate",
+    nav_network: "Network",
     footer: "Prototype for hackathon demo purposes. All vendor data shown is synthetic.",
 
     landing_tagline: "Decision support for the vendor who can't afford to guess wrong.",
@@ -69,6 +71,7 @@ const STRINGS = {
     sim_use_real_weather: "Use tomorrow's real Mumbai forecast",
     sim_weather_source: "Live forecast for {date} · via Open-Meteo",
     sim_weather_error: "Couldn't fetch live weather — adjust manually below.",
+    sim_check_network_cta: "Check the Vendor Network",
 
     futures_title: "{n} FUTURES SIMULATED",
     futures_range: "Possible demand range",
@@ -105,7 +108,7 @@ const STRINGS = {
     savings_recommended: "Survival Stock recommendation",
     savings_waste_cost: "Waste cost",
     savings_monthly: "Projected monthly savings",
-    savings_disclaimer: "Based on prototype simulation assumptions, not real transaction history.",
+    savings_disclaimer: "Estimated from simulation, not real transactions.",
     savings_saved_today: "Saved today",
 
     compare_title: "Compare nearby stock levels",
@@ -147,13 +150,18 @@ const STRINGS = {
     voice_parse: "Parse",
     voice_mic_error: "Couldn't hear anything — check microphone access, or type it instead.",
     voice_no_numbers: "Couldn't find any numbers in that — try again with quantities.",
-    voice_demo_note: "Prototype only — shown for accessibility demo purposes, not saved to the dashboard.",
+    voice_demo_note: "Demo only — not saved.",
 
     neighborhood_title: "Bazaar Intelligence",
     neighborhood_subtitle: "Don't have enough sales history yet? These are pooled, anonymized patterns from nearby vendors — a starting point until your own forecast takes over.",
     neighborhood_vendor_count: "{n} nearby vendors",
     neighborhood_based_on: "Based on",
-    neighborhood_disclaimer: "Anonymized and aggregated across nearby stalls, synthetic for this prototype. Not specific to any one vendor's real sales.",
+    neighborhood_disclaimer: "Anonymized, synthetic data.",
+
+    network_title: "Vendor Network",
+    network_subtitle: "Connect with nearby vendors and borrow patterns from the neighborhood.",
+    network_mesh_locked_title: "Run a simulation first",
+    network_mesh_locked_desc: "Simulate tomorrow to see if a nearby vendor can absorb your surplus or cover your shortage today.",
 
     ocr_title: "Scan a wholesale bill",
     ocr_subtitle: "Photograph a supplier invoice and pull out quantities and prices automatically.",
@@ -166,12 +174,14 @@ const STRINGS = {
     ocr_show_raw: "Show raw extracted text",
     ocr_hide_raw: "Hide raw extracted text",
     ocr_scan_another: "Scan another bill",
-    ocr_demo_note: "Prototype only — OCR runs in your browser, nothing is uploaded or saved. Accuracy varies with handwriting and photo quality.",
+    ocr_demo_note: "Runs in your browser. Nothing uploaded or saved.",
   },
   hi: {
     appName: "BazaarSaathi",
+    brand_tagline: "सही स्टॉक. सही फैसला. बेहतर कल.",
     nav_dashboard: "डैशबोर्ड",
     nav_simulate: "सिमुलेट",
+    nav_network: "नेटवर्क",
     footer: "यह हैकथॉन डेमो के लिए है। सभी डेटा काल्पनिक है।",
 
     landing_tagline: "जो वेंडर गलत अंदाजा नहीं लगा सकता, उसके लिए फैसला सहायता।",
@@ -236,6 +246,7 @@ const STRINGS = {
     sim_use_real_weather: "मुंबई का असली कल का पूर्वानुमान उपयोग करें",
     sim_weather_source: "{date} के लिए लाइव पूर्वानुमान · Open-Meteo के माध्यम से",
     sim_weather_error: "लाइव मौसम नहीं मिला — नीचे मैन्युअल रूप से बदलें।",
+    sim_check_network_cta: "वेंडर नेटवर्क देखें",
 
     futures_title: "{n} भविष्य सिमुलेट किए गए",
     futures_range: "संभावित मांग सीमा",
@@ -272,7 +283,7 @@ const STRINGS = {
     savings_recommended: "सर्वाइवल स्टॉक सिफारिश",
     savings_waste_cost: "बर्बादी लागत",
     savings_monthly: "अनुमानित मासिक बचत",
-    savings_disclaimer: "प्रोटोटाइप सिमुलेशन मान्यताओं पर आधारित।",
+    savings_disclaimer: "सिमुलेशन पर आधारित अनुमान।",
     savings_saved_today: "आज बचा",
 
     compare_title: "नजदीकी स्टॉक स्तरों की तुलना",
@@ -314,13 +325,18 @@ const STRINGS = {
     voice_parse: "पार्स करें",
     voice_mic_error: "कुछ सुनाई नहीं दिया — माइक्रोफ़ोन जांचें, या टाइप करें।",
     voice_no_numbers: "कोई संख्या नहीं मिली — मात्रा के साथ फिर कोशिश करें।",
-    voice_demo_note: "केवल प्रोटोटाइप — डैशबोर्ड में सेव नहीं होता, सिर्फ प्रदर्शन के लिए।",
+    voice_demo_note: "डेमो — सेव नहीं होता।",
 
     neighborhood_title: "बाजार इंटेलिजेंस",
     neighborhood_subtitle: "अभी पर्याप्त बिक्री इतिहास नहीं है? ये नजदीकी वेंडरों के गुमनाम, संयुक्त पैटर्न हैं — आपका अपना पूर्वानुमान तैयार होने तक शुरुआती बिंदु।",
     neighborhood_vendor_count: "{n} नजदीकी वेंडर",
     neighborhood_based_on: "आधारित",
-    neighborhood_disclaimer: "नजदीकी स्टॉल्स में गुमनाम और संयुक्त, इस प्रोटोटाइप के लिए काल्पनिक। किसी एक वेंडर की वास्तविक बिक्री नहीं।",
+    neighborhood_disclaimer: "गुमनाम, काल्पनिक डेटा।",
+
+    network_title: "वेंडर नेटवर्क",
+    network_subtitle: "नजदीकी वेंडरों से जुड़ें और पड़ोस के पैटर्न का उपयोग करें।",
+    network_mesh_locked_title: "पहले सिमुलेशन चलाएं",
+    network_mesh_locked_desc: "देखें कि क्या कोई नजदीकी वेंडर आज आपका अतिरिक्त माल ले सकता है या कमी पूरी कर सकता है।",
 
     ocr_title: "थोक बिल स्कैन करें",
     ocr_subtitle: "सप्लायर इनवॉइस की फोटो लें और मात्रा व कीमत अपने आप निकालें।",
@@ -333,12 +349,14 @@ const STRINGS = {
     ocr_show_raw: "मूल निकाला गया टेक्स्ट दिखाएं",
     ocr_hide_raw: "मूल टेक्स्ट छुपाएं",
     ocr_scan_another: "दूसरा बिल स्कैन करें",
-    ocr_demo_note: "केवल प्रोटोटाइप — OCR आपके ब्राउज़र में चलता है, कुछ भी अपलोड या सेव नहीं होता। सटीकता लिखावट और फोटो गुणवत्ता पर निर्भर करती है।",
+    ocr_demo_note: "आपके ब्राउज़र में चलता है। कुछ भी सेव नहीं होता।",
   },
   mr: {
     appName: "BazaarSaathi",
+    brand_tagline: "योग्य स्टॉक. योग्य निर्णय. चांगला उद्या.",
     nav_dashboard: "डॅशबोर्ड",
     nav_simulate: "सिम्युलेट",
+    nav_network: "नेटवर्क",
     footer: "हे हॅकाथॉन डेमोसाठी आहे. सर्व डेटा काल्पनिक आहे.",
 
     landing_tagline: "चुकीचा अंदाज परवडत नाही अशा विक्रेत्यासाठी निर्णय आधार.",
@@ -403,6 +421,7 @@ const STRINGS = {
     sim_use_real_weather: "मुंबईचा खरा उद्याचा अंदाज वापरा",
     sim_weather_source: "{date} साठी लाइव्ह अंदाज · Open-Meteo मार्फत",
     sim_weather_error: "लाइव्ह हवामान मिळालं नाही — खाली स्वतः बदला.",
+    sim_check_network_cta: "विक्रेता नेटवर्क पाहा",
 
     futures_title: "{n} भविष्यकाळ सिम्युलेट केले",
     futures_range: "संभाव्य मागणी श्रेणी",
@@ -439,7 +458,7 @@ const STRINGS = {
     savings_recommended: "सर्व्हायव्हल स्टॉक शिफारस",
     savings_waste_cost: "वाया गेल्याची किंमत",
     savings_monthly: "अंदाजित मासिक बचत",
-    savings_disclaimer: "प्रोटोटाइप सिम्युलेशन गृहितकांवर आधारित, खऱ्या व्यवहार इतिहासावर नाही.",
+    savings_disclaimer: "सिम्युलेशनवर आधारित अंदाज.",
     savings_saved_today: "आज वाचवलं",
 
     compare_title: "जवळपासच्या स्टॉक पातळ्यांची तुलना",
@@ -481,13 +500,18 @@ const STRINGS = {
     voice_parse: "पार्स करा",
     voice_mic_error: "काही ऐकू आलं नाही — मायक्रोफोन तपासा, किंवा टाइप करा.",
     voice_no_numbers: "त्यात कोणतेही आकडे सापडले नाहीत — प्रमाणासह पुन्हा प्रयत्न करा.",
-    voice_demo_note: "फक्त प्रोटोटाइप — सुलभतेच्या डेमोसाठी दाखवलं आहे, डॅशबोर्डवर सेव्ह होत नाही.",
+    voice_demo_note: "डेमो — सेव्ह होत नाही.",
 
     neighborhood_title: "बाजार इंटेलिजन्स",
     neighborhood_subtitle: "अजून पुरेसा विक्री इतिहास नाही? हे जवळपासच्या विक्रेत्यांचे एकत्रित, निनावी पॅटर्न आहेत — तुमचा स्वतःचा अंदाज तयार होईपर्यंतची सुरुवात.",
     neighborhood_vendor_count: "{n} जवळचे विक्रेते",
     neighborhood_based_on: "यावर आधारित",
-    neighborhood_disclaimer: "जवळपासच्या गाड्यांवरून निनावी आणि एकत्रित, या प्रोटोटाइपसाठी काल्पनिक. कोणत्याही एका विक्रेत्याची खरी विक्री नाही.",
+    neighborhood_disclaimer: "निनावी, काल्पनिक डेटा.",
+
+    network_title: "विक्रेता नेटवर्क",
+    network_subtitle: "जवळपासच्या विक्रेत्यांशी जोडा आणि परिसराचे पॅटर्न वापरा.",
+    network_mesh_locked_title: "आधी सिम्युलेशन चालवा",
+    network_mesh_locked_desc: "आज जवळचा विक्रेता तुमचा जास्तीचा माल घेऊ शकतो का किंवा कमतरता भरून काढू शकतो का ते पाहा.",
 
     ocr_title: "घाऊक बिल स्कॅन करा",
     ocr_subtitle: "सप्लायरच्या बिलाचा फोटो घ्या आणि प्रमाण व किंमत आपोआप काढा.",
@@ -500,7 +524,7 @@ const STRINGS = {
     ocr_show_raw: "मूळ काढलेला मजकूर दाखवा",
     ocr_hide_raw: "मूळ मजकूर लपवा",
     ocr_scan_another: "दुसरं बिल स्कॅन करा",
-    ocr_demo_note: "फक्त प्रोटोटाइप — OCR तुमच्या ब्राउझरमध्ये चालतं, काहीही अपलोड किंवा सेव्ह होत नाही. अचूकता हस्ताक्षर आणि फोटोच्या गुणवत्तेनुसार बदलते.",
+    ocr_demo_note: "तुमच्या ब्राउझरमध्ये चालतं. काहीही सेव्ह होत नाही.",
   },
 };
 

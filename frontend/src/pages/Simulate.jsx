@@ -9,10 +9,9 @@ import StockComparisonTable from "../components/StockComparisonTable.jsx";
 import RiskPersonalityToggle from "../components/RiskPersonalityToggle.jsx";
 import WhyExplainer from "../components/WhyExplainer.jsx";
 import SavingsCalculator from "../components/SavingsCalculator.jsx";
-import BazaarMeshCard from "../components/BazaarMeshCard.jsx";
 import ErrorState from "../components/ErrorState.jsx";
 import { useLanguage } from "../i18n.jsx";
-import { RainIcon, ThermometerIcon, EventIcon, CloudIcon } from "../components/icons.jsx";
+import { RainIcon, ThermometerIcon, EventIcon, CloudIcon, MeshIcon } from "../components/icons.jsx";
 
 const RISK_LABEL_KEYS = {
   protect_cash: "risk_protect_cash",
@@ -20,7 +19,7 @@ const RISK_LABEL_KEYS = {
   maximize_sales: "risk_maximize_sales",
 };
 
-export default function Simulate() {
+export default function Simulate({ onSimulated, onGoToNetwork }) {
   const { t } = useLanguage();
   const [rainProbability, setRainProbability] = useState(0.3);
   const [temperature, setTemperature] = useState(30);
@@ -55,6 +54,7 @@ export default function Simulate() {
       const data = await postSimulate({ rainProbability, temperature, localEvent, riskMode: mode });
       setResult(data);
       setHasSimulated(true);
+      onSimulated?.(data);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -170,7 +170,16 @@ export default function Simulate() {
           <DemandChart distribution={result.demand_distribution} recommendedStock={result.recommended_stock} />
           <WhyExplainer why={result.why_breakdown} riskModeLabel={t(RISK_LABEL_KEYS[result.risk_mode])} />
           <SavingsCalculator savings={result.savings} />
-          <BazaarMeshCard result={result} />
+
+          {onGoToNetwork && (
+            <button
+              onClick={onGoToNetwork}
+              className="w-full flex items-center justify-center gap-2 bg-ink-900 hover:bg-ink-800 text-white font-display font-semibold px-5 py-3.5 rounded-xl transition-all hover:-translate-y-0.5"
+            >
+              <MeshIcon className="w-4 h-4" />
+              {t("sim_check_network_cta")} →
+            </button>
+          )}
 
           <p className="text-center text-sm text-ink-400 italic pt-2 pb-4 max-w-md mx-auto leading-relaxed">
             {t("sim_closing_line")}

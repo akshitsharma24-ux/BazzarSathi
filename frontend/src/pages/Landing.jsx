@@ -62,6 +62,9 @@ export default function Landing({ onEnter }) {
           <p className="text-lg text-ink-500 leading-relaxed max-w-lg mx-auto">
             {t("landing_tagline")}
           </p>
+          <p className="text-xs sm:text-sm font-semibold tracking-[0.15em] uppercase text-mesh-700">
+            {t("brand_tagline")}
+          </p>
           <div className="pt-2">
             <button
               onClick={onEnter}

@@ -3,7 +3,6 @@ import { getDashboard } from "../api/client.js";
 import VendorCard from "../components/VendorCard.jsx";
 import SalesTrendChart from "../components/SalesTrendChart.jsx";
 import ForecastCard from "../components/ForecastCard.jsx";
-import BazaarIntelligenceCard from "../components/BazaarIntelligenceCard.jsx";
 import VoiceLogger from "../components/VoiceLogger.jsx";
 import BillScannerCard from "../components/BillScannerCard.jsx";
 import ErrorState from "../components/ErrorState.jsx";
@@ -42,7 +41,6 @@ export default function Dashboard({ onGoToSimulate }) {
           <VendorCard data={data} />
           <SalesTrendChart />
           <ForecastCard />
-          <BazaarIntelligenceCard />
           <VoiceLogger />
           <BillScannerCard />
 
