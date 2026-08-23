@@ -3,7 +3,9 @@ import Landing from "./pages/Landing.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Simulate from "./pages/Simulate.jsx";
 import Network from "./pages/Network.jsx";
+import AuthModal from "./components/AuthModal.jsx";
 import { useLanguage } from "./i18n.jsx";
+import { useAuth } from "./auth.jsx";
 
 // Simplified crest mark: a market-stall awning over a shield, in the
 // product's own orange/teal pair. Works at 28-32px in the nav.
@@ -46,6 +48,37 @@ function LanguageToggle() {
   );
 }
 
+function AuthButton({ onOpenAuth }) {
+  const { t } = useLanguage();
+  const { enabled, session, profile, signOut } = useAuth();
+  if (!enabled) return null;
+
+  if (session) {
+    return (
+      <div className="flex items-center gap-2 text-xs">
+        <span className="hidden sm:inline text-ink-600 font-medium">
+          {profile?.stall_name || session.user.email}
+        </span>
+        <button
+          onClick={signOut}
+          className="font-semibold text-ink-500 hover:text-ink-800 border border-ink-200 rounded-md px-2 py-1.5"
+        >
+          {t("auth_sign_out")}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={onOpenAuth}
+      className="text-xs font-semibold bg-ink-900 hover:bg-ink-800 text-white rounded-md px-2.5 py-1.5 whitespace-nowrap"
+    >
+      {t("auth_sign_in")}
+    </button>
+  );
+}
+
 const NAV_TABS = [
   { key: "dashboard", labelKey: "nav_dashboard" },
   { key: "simulate", labelKey: "nav_simulate" },
@@ -73,6 +106,7 @@ function NavLink({ active, onClick, children }) {
 export default function App() {
   const [page, setPage] = useState("landing");
   const [simResult, setSimResult] = useState(null);
+  const [authOpen, setAuthOpen] = useState(false);
   const { t } = useLanguage();
 
   return (
@@ -96,9 +130,14 @@ export default function App() {
             </nav>
           )}
 
-          <LanguageToggle />
+          <div className="flex items-center gap-3">
+            <AuthButton onOpenAuth={() => setAuthOpen(true)} />
+            <LanguageToggle />
+          </div>
         </div>
       </header>
+
+      {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
 
       {page !== "landing" && (
         <nav className="sm:hidden bg-white border-b border-ink-200 px-2 flex items-stretch">
@@ -127,7 +166,13 @@ export default function App() {
         {page === "simulate" && (
           <Simulate onSimulated={setSimResult} onGoToNetwork={() => setPage("network")} />
         )}
-        {page === "network" && <Network simResult={simResult} onGoToSimulate={() => setPage("simulate")} />}
+        {page === "network" && (
+          <Network
+            simResult={simResult}
+            onGoToSimulate={() => setPage("simulate")}
+            onRequireAuth={() => setAuthOpen(true)}
+          />
+        )}
       </main>
 
       <footer className="border-t border-ink-200 w-full">

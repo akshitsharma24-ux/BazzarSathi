@@ -1,6 +1,8 @@
 import BazaarIntelligenceCard from "../components/BazaarIntelligenceCard.jsx";
 import BazaarMeshCard from "../components/BazaarMeshCard.jsx";
+import BazaarChat from "../components/BazaarChat.jsx";
 import { useLanguage } from "../i18n.jsx";
+import { useAuth } from "../auth.jsx";
 import { MeshIcon } from "../components/icons.jsx";
 import { Surface, PageHeader, SectionHeader, PrimaryButton } from "../components/ui.jsx";
 
@@ -30,8 +32,9 @@ function NetworkDiagram() {
   );
 }
 
-export default function Network({ simResult, onGoToSimulate }) {
+export default function Network({ simResult, onGoToSimulate, onRequireAuth }) {
   const { t } = useLanguage();
+  const { enabled: chatEnabled } = useAuth();
 
   return (
     <div className="space-y-8">
@@ -71,6 +74,15 @@ export default function Network({ simResult, onGoToSimulate }) {
           )}
         </Surface>
       </div>
+
+      {chatEnabled && (
+        <div>
+          <SectionHeader title={t("chat_title")} subtitle={t("chat_subtitle")} />
+          <Surface className="shadow-card p-5 sm:p-6">
+            <BazaarChat onRequireAuth={onRequireAuth} />
+          </Surface>
+        </div>
+      )}
     </div>
   );
 }
