@@ -3,11 +3,14 @@
 **Target length: 6-8 minutes.** Keep energy up, keep the screen moving —
 narrate over the live app, don't just read slides.
 
-**Not yet recorded.** This script is current against the live app
-(https://bazzar-sathi.vercel.app) as of the 2026-08-22 redesign pass, but no
-actual video file exists yet — recording needs a human voice and screen
-capture, neither of which this session had tooling for. Record against the
-live URL, not localhost, so what judges see matches what's on screen here.
+**Not yet recorded.** No actual video file exists yet — recording needs a
+human voice and screen capture. Record against the live URL
+(https://bazzar-sathi.vercel.app), not localhost, so what judges see matches
+what's on screen here. The demo flow below (Landing → Dashboard → Simulate →
+risk modes → why/savings → Bazaar Mesh → closing line) is still accurate, but
+the app has had a full visual redesign plus vendor login/Bazaar Chat since
+this was written — narrate from the live app's actual screens rather than
+this script's specific visual descriptions.
 
 ---
 

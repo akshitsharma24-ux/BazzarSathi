@@ -11,6 +11,7 @@ frontend/.env.local
 
 # Editors / OS
 .vscode/
+.claude/
 .DS_Store
 Thumbs.db
 
