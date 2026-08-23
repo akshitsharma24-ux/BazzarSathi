@@ -724,3 +724,150 @@ syncs to "mr" and every string is translated; then re-ran the existing
 English regression suite to confirm nothing broke. Zero console errors
 throughout. Pushed and re-verified against the live Vercel URL after each
 commit, per this project's established standard.
+
+## 2026-08-23 — Two urgent pre-submission passes (2-hour deadline)
+
+User came back dissatisfied with the visual polish and flagged concrete
+gaps, with a hard 2-hour submission deadline. Two rounds, back to back.
+
+### Round 1: Vendor Network page, new logo, tagline, disclaimer trim
+
+Complaints: still looked generic, only two visible features (Dashboard/
+Simulate), no way to "connect with other vendors," no login, and the
+per-card disclaimer sentences at the bottom of every feature read as
+uncertainty to a judge. Addressed each:
+
+- **New "Vendor Network" page** (`pages/Network.jsx`) — Bazaar Mesh and
+  Bazaar Intelligence already existed but were buried in scroll on
+  Simulate/Dashboard, so they didn't register as a real feature. Pulled
+  both into their own nav tab. Bazaar Mesh needs a simulation result, so
+  `simResult` state was lifted to `App.jsx` and passed down; the page shows
+  a "run a simulation first" prompt until one exists. Nav became
+  Dashboard | Simulate | Network.
+- **New logo** — simplified crest (market-stall awning over a shield) in
+  the app's teal/orange pair, replacing the old cart icon; also wired up
+  as the favicon (previously unset).
+- **Brand tagline** "Right Stock. Right Decision. Better Tomorrow."
+  (translated per language) added to the landing hero.
+- **Trimmed bottom-of-card disclaimers** app-wide down to a few words
+  each — the repeated "prototype only, not saved, synthetic" sentences on
+  every card were redundant with the one global footer disclaimer.
+- Explicitly did **not** add login/auth — out of the original locked
+  scope, and risky to build correctly under time pressure; told the user
+  to ask explicitly if they wanted a fake demo-only login screen instead.
+
+**Bug found on mobile:** the new 3-tab nav didn't fit next to the logo and
+language toggle on a 375px viewport — "Network" was silently clipped off
+entirely, not just wrapping. Restructured the header to stack nav onto its
+own full-width row on mobile. Verified directly at 375px after the fix.
+
+### Round 2: Complete visual redesign ("Contemporary Indian Commerce")
+
+Immediately after Round 1 shipped, the user sent a very detailed
+(38-section) design brief rejecting the whole visual direction as "AI
+hackathon template" — gradient text, floating blobs, dotted backgrounds,
+pill nav, rounded-2xl everywhere, identical card grids — and asking for a
+ground-up rebuild while preserving every existing feature, API call,
+i18n key, and backend behavior. Explicit instruction: make strong design
+decisions and execute without stopping for approval on each one.
+
+One thing in the brief was superseded by its own later, more detailed
+section: an early one-line comment asked for the Network page to be "a
+chatting room," but the brief's own detailed spec for that page (sections
+23-24) describes a neighborhood-pulse visualization + Bazaar Mesh
+matching, not live chat — and its section 34 explicitly rules out adding
+a database or new heavy infra, which real multi-user chat would need.
+Followed the detailed written spec, not the earlier one-liner, and said so.
+
+**What changed, file by file:**
+
+- `tailwind.config.js` / `index.css` — new token set: warm paper
+  (`#F7F4EE`) / ink (`#18201E`) neutral base, orange (`#D95D20`) reserved
+  for decision/action, teal (`#176B65`) reserved for data/network/healthy
+  state. Removed the grain-texture and blob-drift keyframes entirely.
+  Shadows reduced to near-invisible, radii capped at 10-14px.
+- New `components/ui.jsx` — small shared primitives (`Surface`,
+  `PageHeader`, `SectionHeader`, `Metric`, `PrimaryButton`,
+  `SecondaryButton`, `StatusChip`) so cards stop being hand-typed
+  `bg-white border shadow rounded-2xl` in every file, without building a
+  full design-system abstraction layer.
+- `App.jsx` — textual nav with a 2px orange underline on the active tab
+  instead of a pill container; 64px header; content width up to 1280px.
+- `pages/Landing.jsx` — full rebuild: asymmetric hero (headline/CTA left,
+  a static "decision receipt" product-preview mockup right, using the
+  brief's own example numbers since it's marketing content, not a live
+  result), one horizontal Forecast→Stress Test→Decide→Recover process
+  line instead of three identical cards, an editorial Ramesh section
+  (large statement + simple understock/overstock/balanced typographic
+  comparison) instead of another card grid.
+- `pages/Dashboard.jsx` — rebuilt as an actual operating dashboard: a
+  hero decision strip (forecast + model confidence + CTA in one
+  three-pane surface, replacing the old separate ForecastCard), a tight
+  metric row with dividers (replacing VendorCard), sales trend chart
+  paired with a "what changed" context panel, and a compact two-column
+  "Quick Log" for voice/OCR.
+- `pages/Simulate.jsx` — the hero page. Scenario panel + a live
+  "Tomorrow" preview panel that debounce-fetches `/forecast` as sliders
+  move (350ms), three quick presets (Normal Day / Heavy Rain / Festival
+  Rush — frontend-only, just set the existing sliders, no simulation math
+  touched). After running: new `DecisionHero.jsx` — one dark surface
+  making the recommended stock the single largest number on the page,
+  with expected demand/stockout/waste/profit inline plus a folded-in
+  "why" line, replacing the old separate SurvivalStockCard +
+  SimulationSummary blocks. `RiskPersonalityToggle` rebuilt as a compact
+  segmented control with one dynamic explanation line instead of three
+  large identical cards. `DemandChart` now marks both the raw ML forecast
+  (thin dashed line) and the recommended stock (solid line) so the
+  BazaarTwin distinction — "the model's guess vs. what's actually safe" —
+  is visible at a glance instead of only in prose. `StockComparisonTable`
+  split into a real data table plus a three-row explanation panel derived
+  from actual `stock_level_stats` entries (not fabricated). `WhyExplainer`
+  rebuilt as bars diverging from a center line (positive right/orange,
+  negative left/teal) instead of same-direction magnitude bars.
+  `SavingsCalculator` rebuilt as a naive-vs-recommended horizontal
+  comparison flowing into one monthly-savings figure.
+- `pages/Network.jsx` — renamed "Bazaar Network" per the brief. Bazaar
+  Intelligence and a new lightweight conceptual node diagram (5
+  neighborhood vendors around "Ramesh" at the center, no real geodata —
+  explicitly conceptual, per spec) side by side; Bazaar Mesh below,
+  rebuilt as a "your position → match" flow instead of a plain result card.
+- Deleted now-dead files after confirming via grep that nothing imported
+  them anymore: `ForecastCard`, `VendorCard`, `SimulateButton`,
+  `SimulationSummary`, `SurvivalStockCard`, `Skeleton`, `Reveal`,
+  `useReveal` — all superseded by the new page layouts.
+
+**Two real bugs found and fixed during Playwright verification** (not
+just assumed working from reading the code):
+
+1. The dark "Tomorrow" preview panel on Simulate rendered **white**
+   instead of dark. Cause: the shared `Surface` primitive hardcodes
+   `bg-white`, and a `bg-ink-900` override passed via `className` lost the
+   cascade -- Tailwind utility conflicts resolve by the order classes
+   appear in the *generated* CSS, not by position in the class string, so
+   appending an override in the template literal doesn't reliably beat a
+   base class defined earlier in the component. Fixed by not routing that
+   one dark panel through `Surface` at all (plain `div` with explicit
+   classes). Worth remembering for any future dark/inverted surface.
+2. `StockComparisonTable`'s mobile layout **regressed back** to a
+   horizontally-scrolling table with the Stockout column clipped off a
+   375px viewport with no scroll affordance -- the exact bug a much
+   earlier session already fixed once via `table-fixed`. Restored
+   `table-fixed` with explicit equal-width columns; verified directly at
+   375px that all four columns are visible with zero clipping this time.
+
+**Verification:** production build clean after every major file group
+(not just once at the end); full Playwright pass at 1440x1000 and
+375x812 covering landing → dashboard → simulate (all three presets) →
+decision hero → all three risk modes (re-confirmed correctly ordered
+protect_cash < balanced < maximize_sales) → network → mesh match → Hindi
+→ Marathi, zero console errors throughout every pass. All existing API
+calls, i18n keys, and backend endpoints unchanged -- this was a visual
+rebuild only, confirmed by grepping for any accidental schema/logic
+touches before committing. Pushed, polled the GitHub deployments API for
+`state: success`, and re-verified against the live Vercel URL.
+
+**For continuity:** if a future session picks this up, run
+`git log --oneline` first -- two large redesign passes landed in one
+session here, so anything in this file more than a commit or two old may
+already be superseded. Check the live site directly rather than trusting
+old screenshots.
