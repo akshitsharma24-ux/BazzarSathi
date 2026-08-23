@@ -1,5 +1,33 @@
 import { useLanguage } from "../i18n.jsx";
-import { TrendIcon, DiceIcon, ShieldIcon, MeshIcon } from "../components/icons.jsx";
+import {
+  TrendIcon, DiceIcon, ShieldIcon, MeshIcon, ScaleIcon, RocketIcon, CompassIcon,
+  MicIcon, ReceiptIcon, CloudIcon, CoinIcon, CalendarIcon,
+} from "../components/icons.jsx";
+
+const FEATURES = [
+  { Icon: TrendIcon, titleKey: "feat_forecast_title", descKey: "feat_forecast_desc" },
+  { Icon: DiceIcon, titleKey: "feat_montecarlo_title", descKey: "feat_montecarlo_desc" },
+  { Icon: ShieldIcon, titleKey: "feat_survival_title", descKey: "feat_survival_desc" },
+  { Icon: ScaleIcon, titleKey: "feat_risk_title", descKey: "feat_risk_desc" },
+  { Icon: CalendarIcon, titleKey: "feat_why_title", descKey: "feat_why_desc" },
+  { Icon: CoinIcon, titleKey: "feat_savings_title", descKey: "feat_savings_desc" },
+  { Icon: MeshIcon, titleKey: "feat_mesh_title", descKey: "feat_mesh_desc" },
+  { Icon: CompassIcon, titleKey: "feat_intel_title", descKey: "feat_intel_desc" },
+  { Icon: CloudIcon, titleKey: "feat_weather_title", descKey: "feat_weather_desc" },
+  { Icon: MicIcon, titleKey: "feat_voice_title", descKey: "feat_voice_desc" },
+  { Icon: ReceiptIcon, titleKey: "feat_ocr_title", descKey: "feat_ocr_desc" },
+  { Icon: RocketIcon, titleKey: "feat_login_title", descKey: "feat_login_desc" },
+];
+
+const ROADMAP = [
+  "roadmap_ocr",
+  "roadmap_intel",
+  "roadmap_svanidhi",
+  "roadmap_pos",
+  "roadmap_realdata",
+  "roadmap_cities",
+  "roadmap_offline",
+];
 
 function ReceiptPreview() {
   const { t } = useLanguage();
@@ -45,6 +73,20 @@ function ReceiptPreview() {
       <div className="px-5 py-3 flex items-center justify-between text-xs">
         <span className="text-saathi-600 font-medium">{t("why_event")} ↑ 34%</span>
         <span className="text-mesh-600 font-medium">{t("why_rain")} ↓ 12%</span>
+      </div>
+    </div>
+  );
+}
+
+function FeatureItem({ Icon, title, desc }) {
+  return (
+    <div className="flex gap-3">
+      <span className="shrink-0 w-9 h-9 rounded-lg bg-ink-100 flex items-center justify-center text-ink-600">
+        <Icon className="w-4 h-4" />
+      </span>
+      <div>
+        <h3 className="text-sm font-display font-semibold text-ink-900">{title}</h3>
+        <p className="text-sm text-ink-600 mt-0.5 leading-relaxed">{desc}</p>
       </div>
     </div>
   );
@@ -142,6 +184,36 @@ export default function Landing({ onEnter, onPlan }) {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Everything that's actually built */}
+      <section className="border-t border-ink-200 pt-14">
+        <p className="text-xs font-semibold uppercase tracking-wider text-ink-500 mb-1">
+          {t("features_label")}
+        </p>
+        <h2 className="text-xl font-display font-semibold text-ink-900 mb-8">{t("features_title")}</h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+          {FEATURES.map(({ Icon, titleKey, descKey }) => (
+            <FeatureItem key={titleKey} Icon={Icon} title={t(titleKey)} desc={t(descKey)} />
+          ))}
+        </div>
+      </section>
+
+      {/* Roadmap -- explicitly not built yet */}
+      <section className="border-t border-ink-200 pt-14">
+        <p className="text-xs font-semibold uppercase tracking-wider text-ink-500 mb-1">
+          {t("roadmap_label")}
+        </p>
+        <h2 className="text-xl font-display font-semibold text-ink-900 mb-2">{t("roadmap_title")}</h2>
+        <p className="text-sm text-ink-500 mb-6 max-w-lg">{t("roadmap_subtitle")}</p>
+        <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5">
+          {ROADMAP.map((key) => (
+            <li key={key} className="flex items-start gap-2 text-sm text-ink-600">
+              <span className="text-ink-300 mt-0.5">—</span>
+              {t(key)}
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="border-t border-ink-200 pt-10 text-center">
