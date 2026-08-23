@@ -10,6 +10,7 @@ export default function BazaarChat({ onRequireAuth }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
+  const [onlineCount, setOnlineCount] = useState(1);
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -27,21 +28,32 @@ export default function BazaarChat({ onRequireAuth }) {
         }
       });
 
+    // A per-tab anonymous key so the "online" count reflects everyone
+    // watching the chat, not just signed-in vendors -- more representative
+    // of an actual live audience during a demo.
+    const presenceKey = session?.user?.id || `guest-${Math.random().toString(36).slice(2)}`;
     const channel = supabase
-      .channel("bazaar-chat")
+      .channel("bazaar-chat", { config: { presence: { key: presenceKey } } })
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) => {
         // Dedupe against the optimistic insert in sendMessage() below --
         // if Realtime is working, this event still arrives (often before
         // the insert's own response resolves), so both paths can race.
         setMessages((prev) => (prev.some((m) => m.id === payload.new.id) ? prev : [...prev, payload.new]));
       })
-      .subscribe();
+      .on("presence", { event: "sync" }, () => {
+        setOnlineCount(Math.max(1, Object.keys(channel.presenceState()).length));
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({ online_at: new Date().toISOString() });
+        }
+      });
 
     return () => {
       active = false;
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [session?.user?.id]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: "nearest" });
@@ -70,6 +82,11 @@ export default function BazaarChat({ onRequireAuth }) {
 
   return (
     <div>
+      <div className="flex items-center gap-1.5 text-xs text-ink-500 mb-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-mesh-500 animate-pulse" />
+        {t("chat_online_count", { n: onlineCount })}
+      </div>
+
       <div className="border border-ink-200 rounded-lg h-64 overflow-y-auto p-3 space-y-2 bg-ink-25">
         {loading && <p className="text-xs text-ink-400">…</p>}
         {!loading && messages.length === 0 && (

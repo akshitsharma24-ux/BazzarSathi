@@ -240,6 +240,9 @@ const STRINGS = {
     chat_send: "Send",
     chat_sign_in_prompt: "Sign in to join the conversation",
     chat_empty: "No messages yet — be the first to say hello.",
+    chat_online_count: "{n} vendor(s) here now",
+    profile_edit_title: "Edit your stall",
+    profile_save: "Save",
   },
   hi: {
     appName: "BazaarSaathi",
@@ -480,6 +483,9 @@ const STRINGS = {
     chat_send: "भेजें",
     chat_sign_in_prompt: "बातचीत में शामिल होने के लिए साइन इन करें",
     chat_empty: "अभी तक कोई संदेश नहीं — सबसे पहले नमस्ते कहें।",
+    chat_online_count: "अभी {n} वेंडर यहाँ हैं",
+    profile_edit_title: "अपना स्टॉल संपादित करें",
+    profile_save: "सेव करें",
   },
   mr: {
     appName: "BazaarSaathi",
@@ -720,6 +726,9 @@ const STRINGS = {
     chat_send: "पाठवा",
     chat_sign_in_prompt: "संभाषणात सामील होण्यासाठी साइन इन करा",
     chat_empty: "अजून कोणतेही संदेश नाहीत — सर्वप्रथम नमस्कार म्हणा.",
+    chat_online_count: "आत्ता {n} विक्रेते इथे आहेत",
+    profile_edit_title: "तुमचा स्टॉल संपादित करा",
+    profile_save: "सेव्ह करा",
   },
 };
 

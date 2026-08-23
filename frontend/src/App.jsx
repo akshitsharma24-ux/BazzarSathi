@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Simulate from "./pages/Simulate.jsx";
 import Network from "./pages/Network.jsx";
 import AuthModal from "./components/AuthModal.jsx";
+import ProfileModal from "./components/ProfileModal.jsx";
 import { useLanguage } from "./i18n.jsx";
 import { useAuth } from "./auth.jsx";
 
@@ -48,7 +49,7 @@ function LanguageToggle() {
   );
 }
 
-function AuthButton({ onOpenAuth }) {
+function AuthButton({ onOpenAuth, onOpenProfile }) {
   const { t } = useLanguage();
   const { enabled, session, profile, signOut } = useAuth();
   if (!enabled) return null;
@@ -56,9 +57,12 @@ function AuthButton({ onOpenAuth }) {
   if (session) {
     return (
       <div className="flex items-center gap-2 text-xs">
-        <span className="hidden sm:inline text-ink-600 font-medium">
+        <button
+          onClick={onOpenProfile}
+          className="hidden sm:inline text-ink-600 font-medium hover:text-saathi-600"
+        >
           {profile?.stall_name || session.user.email}
-        </span>
+        </button>
         <button
           onClick={signOut}
           className="font-semibold text-ink-500 hover:text-ink-800 border border-ink-200 rounded-md px-2 py-1.5"
@@ -107,6 +111,7 @@ export default function App() {
   const [page, setPage] = useState("landing");
   const [simResult, setSimResult] = useState(null);
   const [authOpen, setAuthOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const { t } = useLanguage();
 
   return (
@@ -131,13 +136,14 @@ export default function App() {
           )}
 
           <div className="flex items-center gap-3">
-            <AuthButton onOpenAuth={() => setAuthOpen(true)} />
+            <AuthButton onOpenAuth={() => setAuthOpen(true)} onOpenProfile={() => setProfileOpen(true)} />
             <LanguageToggle />
           </div>
         </div>
       </header>
 
       {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
+      {profileOpen && <ProfileModal onClose={() => setProfileOpen(false)} />}
 
       {page !== "landing" && (
         <nav className="sm:hidden bg-white border-b border-ink-200 px-2 flex items-stretch">
