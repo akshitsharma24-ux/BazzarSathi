@@ -29,11 +29,7 @@ export default function SalesTrendChart() {
   }, []);
 
   if (!data || data.points.length < 2) {
-    return (
-      <div className="bg-white rounded-2xl shadow-card border border-ink-100 p-5 sm:p-7 animate-fade-up">
-        <div className="h-40 rounded-lg skeleton-shimmer" />
-      </div>
-    );
+    return <div className="h-40 rounded-lg skeleton-shimmer" />;
   }
 
   const values = data.points.map((p) => p.units_sold);
@@ -53,7 +49,7 @@ export default function SalesTrendChart() {
   const active = hoverIdx != null ? points[hoverIdx] : points[points.length - 1];
 
   return (
-    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
+    <div>
       <div className="flex items-start justify-between gap-4 flex-wrap mb-1">
         <div>
           <h3 className="font-display font-semibold text-ink-900 flex items-center gap-1.5">
@@ -75,10 +71,14 @@ export default function SalesTrendChart() {
       >
         <defs>
           <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#249a91" stopOpacity="0.28" />
+            <stop offset="0%" stopColor="#249a91" stopOpacity="0.22" />
             <stop offset="100%" stopColor="#249a91" stopOpacity="0" />
           </linearGradient>
         </defs>
+
+        {[0.25, 0.5, 0.75].map((f) => (
+          <line key={f} x1={0} x2={WIDTH} y1={HEIGHT * f} y2={HEIGHT * f} stroke="#e1dbcd" strokeWidth={1} />
+        ))}
 
         <path d={areaPath} fill="url(#trendFill)" />
         <path d={linePath} fill="none" stroke="#1c7c76" strokeWidth="2.25" strokeLinecap="round" />
@@ -117,3 +117,4 @@ export default function SalesTrendChart() {
     </div>
   );
 }
+

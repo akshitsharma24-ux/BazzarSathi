@@ -16,12 +16,6 @@ h3 {
   font-family: theme("fontFamily.display");
 }
 
-/* Subtle dotted-grain texture used behind hero/landing sections. */
-.bg-textured {
-  background-image: theme("backgroundImage.grain");
-  background-size: theme("backgroundSize.grain");
-}
-
 /* Tabular numerals for stat displays so digits don't jitter in width. */
 .tabular-nums-all {
   font-variant-numeric: tabular-nums;

@@ -75,17 +75,17 @@ export default function BillScannerCard() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+    <div className="bg-white border border-ink-200 rounded-xl p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h3 className="font-display font-semibold text-ink-900 flex items-center gap-1.5">
+          <h3 className="text-sm font-display font-semibold text-ink-900 flex items-center gap-1.5">
             <ReceiptIcon className="w-4 h-4 text-ink-500" /> {t("ocr_title")}
           </h3>
-          <p className="text-sm text-ink-500 mt-0.5 max-w-sm">{t("ocr_subtitle")}</p>
+          <p className="text-xs text-ink-500 mt-0.5 max-w-sm">{t("ocr_subtitle")}</p>
         </div>
 
         {status !== "loading" && (
-          <label className="shrink-0 cursor-pointer bg-mesh-600 hover:bg-mesh-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition">
+          <label className="shrink-0 cursor-pointer bg-mesh-600 hover:bg-mesh-700 text-white text-xs font-medium px-3 py-2 rounded-[8px] transition">
             {t("ocr_upload")}
             <input
               ref={fileInputRef}
@@ -151,7 +151,6 @@ export default function BillScannerCard() {
                 </pre>
               )}
 
-              <p className="text-[11px] text-ink-400 mt-3">{t("ocr_demo_note")}</p>
               <button
                 onClick={reset}
                 className="mt-2 text-xs text-ink-400 hover:text-ink-600 underline"
@@ -162,6 +161,8 @@ export default function BillScannerCard() {
           )}
         </div>
       )}
+
+      <p className="text-[10px] text-ink-400 mt-3 pt-3 border-t border-ink-100">{t("ocr_demo_note")}</p>
     </div>
   );
 }

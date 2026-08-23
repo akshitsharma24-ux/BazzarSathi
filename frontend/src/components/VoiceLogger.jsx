@@ -110,26 +110,26 @@ export default function VoiceLogger() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+    <div className="bg-white border border-ink-200 rounded-xl p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h3 className="font-display font-semibold text-ink-900 flex items-center gap-1.5">
+          <h3 className="text-sm font-display font-semibold text-ink-900 flex items-center gap-1.5">
             <MicIcon className="w-4 h-4 text-ink-500" /> {t("voice_title")}
           </h3>
-          <p className="text-sm text-ink-500 mt-0.5 max-w-sm">{t("voice_subtitle")}</p>
+          <p className="text-xs text-ink-500 mt-0.5 max-w-sm">{t("voice_subtitle")}</p>
         </div>
 
         {supported && (
           <button
             onClick={listening ? stopListening : startListening}
-            className={`shrink-0 flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition ${
+            className={`shrink-0 flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-[8px] transition ${
               listening
                 ? "bg-rose-500 hover:bg-rose-600 text-white"
                 : "bg-mesh-600 hover:bg-mesh-700 text-white"
             }`}
           >
             <span
-              className={`w-2 h-2 rounded-full bg-white ${listening ? "animate-pulse" : ""}`}
+              className={`w-1.5 h-1.5 rounded-full bg-white ${listening ? "animate-pulse" : ""}`}
               aria-hidden="true"
             />
             {listening ? t("voice_listening") : t("voice_start")}
@@ -163,29 +163,30 @@ export default function VoiceLogger() {
       )}
 
       {transcript && (
-        <div className="mt-4 pt-4 border-t border-ink-100 space-y-3 animate-fade-in">
-          <p className="text-sm text-ink-500 italic">&ldquo;{transcript}&rdquo;</p>
+        <div className="mt-3 pt-3 border-t border-ink-100 space-y-2 animate-fade-in">
+          <p className="text-xs text-ink-500 italic">&ldquo;{transcript}&rdquo;</p>
           {parsed && (parsed.sold != null || parsed.unsold != null) ? (
-            <div className="flex gap-6">
+            <div className="flex gap-5">
               <div>
-                <p className="text-[11px] uppercase tracking-wide text-ink-400">{t("dash_sold")}</p>
-                <p className="text-xl font-display font-bold text-mesh-600 tabular-nums-all">
+                <p className="text-[10px] uppercase tracking-wide text-ink-400">{t("dash_sold")}</p>
+                <p className="text-lg font-display font-bold text-mesh-600 tabular-nums-all">
                   {parsed.sold ?? "—"}
                 </p>
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-wide text-ink-400">{t("dash_unsold")}</p>
-                <p className="text-xl font-display font-bold text-rose-500 tabular-nums-all">
+                <p className="text-[10px] uppercase tracking-wide text-ink-400">{t("dash_unsold")}</p>
+                <p className="text-lg font-display font-bold text-rose-500 tabular-nums-all">
                   {parsed.unsold ?? "—"}
                 </p>
               </div>
             </div>
           ) : (
-            <p className="text-sm text-ink-400">{t("voice_no_numbers")}</p>
+            <p className="text-xs text-ink-400">{t("voice_no_numbers")}</p>
           )}
-          <p className="text-[11px] text-ink-400">{t("voice_demo_note")}</p>
         </div>
       )}
+
+      <p className="text-[10px] text-ink-400 mt-3 pt-3 border-t border-ink-100">{t("voice_demo_note")}</p>
     </div>
   );
 }

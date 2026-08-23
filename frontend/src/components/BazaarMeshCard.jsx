@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { postMeshMatch } from "../api/client.js";
 import { useLanguage } from "../i18n.jsx";
-import { MeshIcon, ZapIcon } from "./icons.jsx";
+import { ZapIcon } from "./icons.jsx";
+import { PrimaryButton, TextButton } from "./ui.jsx";
 
 const SURPLUS_SHORTAGE_THRESHOLD = 5; // units of slack before we call it "balanced"
 
@@ -50,75 +51,68 @@ export default function BazaarMeshCard({ result }) {
 
   const rupee = (n) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
-  return (
-    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
+  if (state === "idle" || state === "loading" || state === "error") {
+    return (
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h3 className="font-display font-semibold text-ink-900 flex items-center gap-1.5">
-            <MeshIcon className="w-4 h-4 text-ink-500" /> {t("mesh_title")}
-          </h3>
-          <p className="text-sm text-ink-500 mt-1 max-w-sm">{t("mesh_subtitle")}</p>
-        </div>
-        {state !== "done" && (
-          <button
-            onClick={handleCheck}
-            disabled={state === "loading"}
-            className="shrink-0 bg-ink-900 hover:bg-ink-800 disabled:bg-ink-300 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition"
-          >
-            {state === "loading" ? t("mesh_checking") : t("mesh_check_button")}
-          </button>
+        <p className="text-sm text-ink-500 max-w-sm">{t("mesh_subtitle")}</p>
+        <PrimaryButton onClick={handleCheck} disabled={state === "loading"}>
+          {state === "loading" ? t("mesh_checking") : t("mesh_check_button")}
+        </PrimaryButton>
+        {state === "error" && (
+          <p className="w-full text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-lg p-3">
+            {t("mesh_error")}
+          </p>
         )}
       </div>
+    );
+  }
 
-      {state === "error" && (
-        <p className="mt-4 text-sm text-rose-500 bg-rose-50 border border-rose-200 rounded-xl p-3">
-          {t("mesh_error")}
-        </p>
-      )}
+  const ourDirectionLabel = ourStatus?.direction === "surplus" ? t("mesh_has_surplus") : t("mesh_short_on");
 
-      {state === "done" && response && (
-        <div className="mt-4 animate-fade-in">
-          {response.match_found ? (
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-              <p className="text-xs uppercase tracking-wide text-emerald-700 font-semibold mb-2 flex items-center gap-1">
-                <ZapIcon className="w-3.5 h-3.5" /> {t("mesh_match_found")}
-              </p>
-              <p className="text-sm text-ink-700">
-                <span className="font-semibold">{response.match.vendor_name}</span>{" "}
-                <span className="font-semibold">{response.match.distance_m}m</span> {t("mesh_away")} ·{" "}
-                {response.match.their_status === "shortage" ? t("mesh_short_on") : t("mesh_has_surplus")}{" "}
-                <span className="font-semibold">{response.item}</span>.
-              </p>
-              <div className="grid grid-cols-2 gap-4 mt-3">
-                <div>
-                  <p className="text-xs text-ink-400">{t("mesh_qty_matched")}</p>
-                  <p className="text-lg font-display font-bold text-ink-800 tabular-nums-all">
-                    {response.match.matched_quantity} {t("survival_units")}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-ink-400">{t("mesh_value_recovered")}</p>
-                  <p className="text-lg font-display font-bold text-emerald-700 tabular-nums-all">
-                    {rupee(response.match.estimated_value_recovered)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-xl border border-ink-100 bg-ink-50 p-4">
-              <p className="text-sm text-ink-600">
-                {ourStatus?.direction === "balanced" ? t("mesh_balanced") : t("mesh_no_match")}
+  return (
+    <div className="animate-fade-in">
+      {response.match_found ? (
+        <div>
+          <div className="grid sm:grid-cols-[1fr_auto_1fr] items-center gap-4 mb-4">
+            <div className="border border-ink-200 rounded-lg p-3 text-center">
+              <p className="text-[10px] uppercase tracking-wide text-ink-500">{t("mesh_your_position")}</p>
+              <p className="text-sm font-semibold text-ink-800 mt-1 capitalize">
+                {ourDirectionLabel} · {ourStatus.quantity} {t("survival_units")}
               </p>
             </div>
-          )}
-          <button
-            onClick={() => setState("idle")}
-            className="mt-3 text-xs text-ink-400 hover:text-ink-600 underline"
-          >
-            {t("mesh_check_again")}
-          </button>
+            <ZapIcon className="w-5 h-5 text-saathi-500 mx-auto rotate-90 sm:rotate-0" />
+            <div className="border-2 border-mesh-400 bg-mesh-50 rounded-lg p-3 text-center">
+              <p className="text-[10px] uppercase tracking-wide text-mesh-700 font-semibold">{t("mesh_match_found")}</p>
+              <p className="text-sm font-semibold text-mesh-800 mt-1">{response.match.vendor_name}</p>
+              <p className="text-xs text-mesh-700">{response.match.distance_m}m {t("mesh_away")}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 border-t border-ink-200 pt-4">
+            <div>
+              <p className="text-xs text-ink-500">{t("mesh_qty_matched")}</p>
+              <p className="text-xl font-display font-bold text-ink-800 tabular-nums-all">
+                {response.match.matched_quantity} {t("survival_units")}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-ink-500">{t("mesh_value_recovered")}</p>
+              <p className="text-xl font-display font-bold text-mesh-700 tabular-nums-all">
+                {rupee(response.match.estimated_value_recovered)}
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="border border-ink-200 rounded-lg p-4">
+          <p className="text-sm text-ink-600">
+            {ourStatus?.direction === "balanced" ? t("mesh_balanced") : t("mesh_no_match")}
+          </p>
         </div>
       )}
+      <TextButton onClick={() => setState("idle")} className="mt-3 text-ink-400 hover:text-ink-600">
+        {t("mesh_check_again")}
+      </TextButton>
     </div>
   );
 }

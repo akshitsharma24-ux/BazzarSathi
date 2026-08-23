@@ -1,40 +1,45 @@
 import { useLanguage } from "../i18n.jsx";
-import { RainIcon, CalendarIcon, EventIcon, TrendIcon, CoinIcon } from "./icons.jsx";
 
 const DRIVER_META = {
-  rain_impact_pct: { labelKey: "why_rain", Icon: RainIcon },
-  weekend_impact_pct: { labelKey: "why_weekend", Icon: CalendarIcon },
-  event_impact_pct: { labelKey: "why_event", Icon: EventIcon },
-  trend_impact_pct: { labelKey: "why_trend", Icon: TrendIcon },
+  rain_impact_pct: "why_rain",
+  weekend_impact_pct: "why_weekend",
+  event_impact_pct: "why_event",
+  trend_impact_pct: "why_trend",
 };
 
 function DriverRow({ driverKey, pct, t }) {
-  const meta = DRIVER_META[driverKey];
-  if (!meta) return null;
-  const { Icon } = meta;
+  const labelKey = DRIVER_META[driverKey];
+  if (!labelKey) return null;
 
   const positive = pct >= 0;
-  const magnitude = Math.min(Math.abs(pct), 100);
+  const magnitude = Math.min(Math.abs(pct), 50); // 50% fills half the track either direction
 
   return (
-    <div className="flex items-center gap-3 py-2.5">
-      <span className="w-7 h-7 rounded-full bg-ink-50 flex items-center justify-center shrink-0 text-ink-500">
-        <Icon className="w-4 h-4" />
-      </span>
-      <span className="w-24 sm:w-28 text-sm text-ink-600 shrink-0">{t(meta.labelKey)}</span>
-      <div className="flex-1 h-2 bg-ink-100 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-700 ${positive ? "bg-saathi-500" : "bg-mesh-500"}`}
-          style={{ width: `${magnitude}%` }}
-        />
+    <div className="flex items-center gap-3 py-2">
+      <span className="w-24 sm:w-28 text-sm text-ink-700 shrink-0">{t(labelKey)}</span>
+      <div className="relative flex-1 h-5">
+        <div className="absolute inset-y-0 left-1/2 w-px bg-ink-300" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="relative w-1/2 h-2.5">
+            {!positive && (
+              <div
+                className="absolute right-0 h-full bg-mesh-500 rounded-l-sm origin-right animate-grow-x"
+                style={{ width: `${(magnitude / 50) * 100}%` }}
+              />
+            )}
+          </div>
+          <div className="relative w-1/2 h-2.5">
+            {positive && (
+              <div
+                className="absolute left-0 h-full bg-saathi-500 rounded-r-sm origin-left animate-grow-x"
+                style={{ width: `${(magnitude / 50) * 100}%` }}
+              />
+            )}
+          </div>
+        </div>
       </div>
-      <span
-        className={`w-16 text-right text-sm font-semibold tabular-nums-all shrink-0 ${
-          positive ? "text-saathi-700" : "text-mesh-600"
-        }`}
-      >
-        {positive ? "+" : ""}
-        {pct}%
+      <span className={`w-14 text-right text-sm font-semibold tabular-nums-all shrink-0 ${positive ? "text-saathi-700" : "text-mesh-700"}`}>
+        {positive ? "+" : ""}{pct}%
       </span>
     </div>
   );
@@ -45,19 +50,15 @@ export default function WhyExplainer({ why, riskModeLabel }) {
   if (!why) return null;
 
   return (
-    <div className="bg-white rounded-2xl shadow-card hover:shadow-card-hover border border-ink-100 p-5 sm:p-7 animate-fade-up transition-shadow duration-300">
-      <h3 className="font-display font-semibold text-ink-900 mb-1">{t("why_title")}</h3>
-      <p className="text-sm text-ink-500 mb-1">{t("why_subtitle")}</p>
-      <div className="divide-y divide-ink-50">
+    <div>
+      <div className="divide-y divide-ink-100">
         {Object.entries(why).map(([key, pct]) => (
           <DriverRow key={key} driverKey={key} pct={pct} t={t} />
         ))}
       </div>
       {riskModeLabel && (
-        <div className="mt-2 pt-3 border-t border-ink-100 flex items-center justify-between text-sm">
-          <span className="text-ink-500 flex items-center gap-1.5">
-            <CoinIcon className="w-4 h-4 text-ink-400" /> {t("why_risk_mode")}
-          </span>
+        <div className="mt-2 pt-3 border-t border-ink-200 flex items-center justify-between text-sm">
+          <span className="text-ink-600">{t("why_risk_mode")}</span>
           <span className="font-semibold text-ink-800">{riskModeLabel}</span>
         </div>
       )}
